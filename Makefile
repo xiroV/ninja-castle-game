@@ -2,14 +2,16 @@ CC = g++
 LIBS = -lGL -lglut -lGLU -lGLEW
 CFLAGS = -Wall
 
-all:	test1
+all:	ctf-game
 
-test1: test1.o
+ctf-game: main.o player.o map.o
+	$(CC) -o $@ main.o player.o map.o $(LIBS)
 
-	$(CC) -o $@ test1.o $(LIBS)
+#player: player.o
+#	$(CC) -o $@ player.o $(LIBS)
 
 %.o: %.cpp
 	$(CC) -c $(CFLAGS) $<
 
 clean:
-	rm -f test1 *.o
+	rm -f ctf-game *.o
