@@ -14,7 +14,7 @@ class Map {
 
 
         Map();
-        void init(char* filename);
+        void init(std::string filename);
         void draw();
 };
 

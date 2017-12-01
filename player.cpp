@@ -1,9 +1,9 @@
 #include "player.h"
 
-float mat0_color[] = {0.0, 1.0, 1.0, 1.0};
-float mat1_color[] = {1.0, 0.0, 0.0, 1.0};
-float mat1_spec[] = {0.8, 0.8, 0.8, 1.0};
-float mat1_shine[] = {30};
+float player_ambi[] = {0.0, 0.0, 0.0, 0.0};
+float player_diff[] = {0.3, 0.3, 0.3, 1.0};
+float player_spec[] = {0.1, 0.1, 0.1, 1.0};
+float player_shin[] = {10};
 
 const char* player_vertex_source = R"glsl(
     #version 150 core
@@ -23,17 +23,17 @@ const char* player_fragment_source = R"glsl(
 
     void main()
     {
-        outColor = vec4(1.0, 0.0, 0.0, 1.0);
+        outColor = vec4(0.0, 0.0, 1.0, 1.0);
     }
 )glsl";
 
 
-
 Player::Player() {}
 
-void Player::init(char* filename, bool player, Team team, float x, float y) {
-    FILE *fp;     
+void Player::init(char* filename, Team team, float x, float y, Collision collision_map) {
+    FILE *fp;
 
+    this->collision_map = collision_map;
 
     std::vector<unsigned int> vertex_indices, uv_indices, normal_indices;
     
@@ -96,6 +96,7 @@ void Player::init(char* filename, bool player, Team team, float x, float y) {
     } // Done reading file
 
 
+
     fclose(fp);
 
     // Now processing indices
@@ -114,7 +115,6 @@ void Player::init(char* filename, bool player, Team team, float x, float y) {
         this->normals.push_back(normal);
     }
 
-
     // Generate model buffers
     glGenBuffers(1, &this->buffer);
     glBindBuffer(GL_ARRAY_BUFFER, this->buffer);
@@ -128,8 +128,6 @@ void Player::init(char* filename, bool player, Team team, float x, float y) {
     glBindBuffer(GL_ARRAY_BUFFER, this->nsbuffer);
     glBufferData(GL_ARRAY_BUFFER, this->normals.size() * sizeof(glm::vec3), &this->normals[0], GL_STATIC_DRAW);
  
-
-
 
     // Vertex Shader
     GLuint vertex_shader = glCreateShader(GL_VERTEX_SHADER);
@@ -145,17 +143,26 @@ void Player::init(char* filename, bool player, Team team, float x, float y) {
     this->shader_program = glCreateProgram();
     glAttachShader(this->shader_program, vertex_shader);
     glAttachShader(this->shader_program, fragment_shader);
+    //glBindFragDataLocation(this->shader_program, 0, "outColor");
+    //glLinkProgram(this->shader_program);
+    //glUseProgram(this->shader_program);
 
-    if(player) {
-        this->state = PLAYER;
-    } else {
-        this->state = WAIT;
-    }
+    /*glEnableVertexAttribArray(0);
+    glBindBuffer(GL_ARRAY_BUFFER, this->buffer);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
+
+    glEnableVertexAttribArray(1);
+    glBindBuffer(GL_ARRAY_BUFFER, this->uvbuffer);
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, 0);
+
+    glEnableVertexAttribArray(2);
+    glBindBuffer(GL_ARRAY_BUFFER, this->nsbuffer);
+    glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, 0);*/
 
     this->team = team;
     this->x = x;
     this->y = y;
-    this->z = CHAR_SIZE/2;
+    this->z = 0;
     this->angle = 0.0;
     this->moving = false;
     this->backing = false;
@@ -166,13 +173,14 @@ void Player::init(char* filename, bool player, Team team, float x, float y) {
     this->time_last_move = 0;
     this->time_last_back = 0;
     this->time_last_rot = 0;
-
+    this->time_last_jump = 0;
+    this->vel_x = 0.0;
+    this->vel_y = 0.0;
+    this->vel_z = 0.0;
 }
 
 void Player::draw() {
-    //glTranslatef(this->x, 0.0, this->y);
-    glScalef(1.0, 1.0, 1.0);
-    //glRotatef(110, 0, 1, 0);
+
 
     glUseProgram(this->shader_program);
 
@@ -180,54 +188,69 @@ void Player::draw() {
     glBindBuffer(GL_ARRAY_BUFFER, this->buffer);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
-    /*glEnableVertexAttribArray(1);
-    glBindBuffer(GL_ARRAY_BUFFER, this->uvbuffer);
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, 0);*/
-
     glEnableVertexAttribArray(2);
     glBindBuffer(GL_ARRAY_BUFFER, this->nsbuffer);
     glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
-
-
     int cur_time = glutGet(GLUT_ELAPSED_TIME);
-
     bool changed = false;
 
+
+    float gravity = 0.005;
+    if(!this->collision_map.on_floor(this->x, this->y)) {
+        if(cur_time - this->time_last_jump > 5) {
+            if(this->z > -10) {
+                this->vel_z -= gravity;
+                this->z += vel_z;
+            }
+        }
+        changed = true;
+    }
+
+    // Calculate gravity 
+    if(this->jumping || this->z > 0.0) {
+        if(cur_time - this->time_last_jump > 5) {
+            this->vel_z -= gravity;
+            this->z += vel_z;
+        }
+        changed = true;
+    }
+
+    if(this->z <= 0.0 && this->collision_map.on_floor(this->x, this->y)) {
+        this->z = 0.0;
+    }
+
     // Movement to position 
-    glTranslatef(this->x, 0.0, this->y);
-     
+    glTranslatef(this->x, this->z, this->y);
 
     // Rotation around itself
     glRotatef(this->angle, 0, 1, 0);
     
     // Make rotation transformation
-    /*glm::mat4 rot; 
-    rot = glm::rotate(
-        rot,
+    /*glm::mat4 model;
+    model = glm::rotate(
+        model,
         glm::radians(this->angle),
         glm::vec3(0.0, 1.0, 0.0)
-    );
+    );*/
 
     // Apply rotation transformation
-    GLint uniTrans = glGetUniformLocation(shader_program, "rot");
-    glUniformMatrix4fv(uniTrans, 1, GL_FALSE, glm::value_ptr(rot));
-    */
+    //glUniformMatrix4fv(this->uni_model, 1, GL_FALSE, glm::value_ptr(model));
 
+    glMaterialfv(GL_FRONT, GL_AMBIENT, player_ambi);
+    glMaterialfv(GL_FRONT, GL_DIFFUSE, player_diff);
+    glMaterialfv(GL_FRONT, GL_SPECULAR, player_spec);
+    glMaterialfv(GL_FRONT, GL_SHININESS, player_shin);
 
     glDrawArrays(GL_TRIANGLES, 0, this->vertices.size());
 
-    //glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, mat1_color);
     /*glMaterialfv(GL_FRONT, GL_SPECULAR, mat1_spec);
     glMaterialfv(GL_FRONT, GL_SHININESS, mat1_shine);*/
 
-    //glutSolidCube(CHAR_SIZE-1); // Box.
-
     // Left Rotation
     if(this->rotating_left) {
-        //std::cout << "Rotating left" << std::endl;
         if(cur_time - this->time_last_rot > CHAR_ROT_FRAMERATE) {
-            this->angle++;
+            this->angle += CHAR_ROT_SPEED;
             if(this->angle >= 360) {
                 this->angle = 0;
             }
@@ -238,7 +261,7 @@ void Player::draw() {
     // Right Rotation
     if(this->rotating_right) {
         if(cur_time - this->time_last_rot > CHAR_ROT_FRAMERATE) {
-            this->angle--;
+            this->angle -= CHAR_ROT_SPEED;
             if(this->angle <= 0) {
                 this->angle = 360;
             }
@@ -247,72 +270,87 @@ void Player::draw() {
     }
 
     // Movement
-    if(this->moving && this->y < MAP_SIZE && this->y > 0 && this->x < MAP_SIZE && this->x > 0) {
+    //if(this->moving && this->y < MAP_SIZE_Y && this->y > 0 && this->x < MAP_SIZE_X && this->x > 0) {
+    if(this->moving && this->z >= -1.0) {
         if(cur_time - this->time_last_move > CHAR_MOVE_FRAMERATE) {
 
-            //std::cout << "Moving!" << std::endl;
             // Calculate new position based on angle
-            this->x = this->x + sin(angle*PI/180)/sin(90*PI/180) * CHAR_MOVE_SPEED;
-            this->y = this->y + sin((180.0-angle-90.0)*PI/180)/sin(90*PI/180) * CHAR_MOVE_SPEED;
+            /*float new_x = this->x + sin(angle*PI/180)/sin(90*PI/180) * CHAR_MOVE_SPEED;
+            float new_y = this->y + sin((180.0-angle-90.0)*PI/180)/sin(90*PI/180) * CHAR_MOVE_SPEED;*/
+            float new_x = this->x + (sin(this->angle*PI/180) * CHAR_MOVE_SPEED);
+            float new_y = this->y + (cos(this->angle*PI/180) * CHAR_MOVE_SPEED);
 
-            if(this->x > MAP_SIZE-CHAR_SIZE/2) {
-                this->x = MAP_SIZE-CHAR_SIZE/2;
+            float ray_x = this->x + (sin(this->angle*PI/180) * CHAR_MOVE_SPEED*2);
+            float ray_y = this->y + (cos(this->angle*PI/180) * CHAR_MOVE_SPEED*2);
+
+
+            //float ray_x = this->x + sin(angle*PI/180)/sin(90*PI/180);
+            //float ray_y = this->y + sin((180.0-angle-90.0)*PI/180)/sin(90*PI/180);
+
+            std::cout << "Position: " << this->x << " " << this->y << " " << this->z << std::endl;
+            //std::cout << "Ray: " << ray_x << " " << ray_y << std::endl; 
+
+            if(this->collision_map.on_floor(this->x, this->y)) {
+                std::cout << "PLAYER_ON_FLOOR" << std::endl;
             }
 
-            if(this->y > MAP_SIZE-CHAR_SIZE/2) {
-                this->y = MAP_SIZE-CHAR_SIZE/2;
+            if(this->collision_map.wall_hit_x(ray_x, ray_y)) {
+                //std::cout << "Collision x" << std::endl;
+                new_x = this->x;
             }
 
-            if(this->x < CHAR_SIZE/2) {
-                this->x = CHAR_SIZE/2;
+            if(this->collision_map.wall_hit_y(ray_x, ray_y)) {
+                //std::cout << "Collision y" << std::endl;
+                new_y = this->y;
             }
 
-            if(this->y < CHAR_SIZE/2) {
-                this->y = CHAR_SIZE/2;
+            this->x = new_x;
+            this->y = new_y;
+
+            /*if(this->x < CHAR_SIZE/2+4) {
+                this->x = CHAR_SIZE/2+4;
             }
+
+            if(this->y < CHAR_SIZE/2+2) {
+                this->y = CHAR_SIZE/2+2;
+            }*/
         }
         changed = true;
     }
-/*
+
     // Movement (backwards)
     if(this->backing
-            && this->y < MAP_SIZE
+            && this->y < MAP_SIZE_Y
             && this->y > 0
-            && this->x < MAP_SIZE
+            && this->x < MAP_SIZE_X
             && this->x > 0) {
         if(cur_time - this->time_last_back > CHAR_BACK_FRAMERATE) {
 
             // Calculate new position based on angle
-            this->x = this->x + sin(-angle*PI/180)/sin(90*PI/180);
-            this->y = this->y + sin(-(180.0-angle-90.0)*PI/180)/sin(90*PI/180);
+            this->x = this->x + sin(-angle*PI/180)/sin(90*PI/180) * (CHAR_MOVE_SPEED/2.5);
+            this->y = this->y + sin(-(180.0-angle-90.0)*PI/180)/sin(90*PI/180) * (CHAR_MOVE_SPEED/2.5);
 
-            if(this->x > MAP_SIZE-CHAR_SIZE/2) {
-                this->x = MAP_SIZE-CHAR_SIZE/2;
+            if(this->x > MAP_SIZE_X-CHAR_SIZE/2) {
+                this->x = MAP_SIZE_X-CHAR_SIZE/2;
             }
 
-            if(this->y > MAP_SIZE-CHAR_SIZE/2) {
-                this->y = MAP_SIZE-CHAR_SIZE/2;
+            if(this->y > MAP_SIZE_Y-CHAR_SIZE/2) {
+                this->y = MAP_SIZE_Y-CHAR_SIZE/2;
             }
 
-            if(this->x < CHAR_SIZE/2) {
-                this->x = CHAR_SIZE/2;
+            if(this->x < CHAR_SIZE/2+4) {
+                this->x = CHAR_SIZE/2+4;
             }
 
-            if(this->y < CHAR_SIZE/2) {
-                this->y = CHAR_SIZE/2;
+            if(this->y < CHAR_SIZE/2+2) {
+                this->y = CHAR_SIZE/2+2;
             }
         }
         changed = true;
     }
 
-    // Jump
-    if(this->jumping && this->z == CHAR_SIZE/2) {
-        this->jump_start = cur_time;
-    }
-*/
-
     glDisableVertexAttribArray(0);    
-    glDisableVertexAttribArray(2);    
+    glDisableVertexAttribArray(2);
 
 
     if(changed) {
@@ -325,19 +363,15 @@ void Player::draw() {
         if(cur_time - this->time_last_rot > CHAR_ROT_FRAMERATE) {
             this->time_last_rot = cur_time;
         }
+        if(cur_time - this->time_last_jump > 5) {
+            this->time_last_jump = cur_time;
+        }
         glutPostRedisplay();
     }
-
-
-    
 }
 
 void Player::set_team(Team team) {
     this->team = team;
-}
-
-void Player::set_state(AiState state) {
-    this->state = state;
 }
 
 void Player::set_pos(float x, float y) {
@@ -366,5 +400,15 @@ void Player::set_backing(bool val) {
 }
 
 void Player::set_jumping(bool val) {
-    this->jumping = val;
+    if(val) {
+        this->jumping = true;
+        if(this->z <= 0.0) {
+            this->vel_z = 0.2;
+        }
+    } else {
+        this->jumping = false;
+        if(this->vel_z < 0) {
+            this->vel_z = 0;   
+        }
+    }
 }

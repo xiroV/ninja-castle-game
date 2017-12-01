@@ -1,22 +1,8 @@
 #include "common.h"
-
-enum Team {
-    RED,
-    BLUE
-};
-
-enum AiState {
-    WAIT,
-    KILL_EFC,
-    CAP_FLAG,
-    RET_FLAG,
-    KILL_ANY,
-    PLAYER,
-};
+#include "collision.h"
 
 class Player {
     public:
-        AiState state;
         Team team;
         float x;
         float y;
@@ -31,19 +17,24 @@ class Player {
         int time_last_move;
         int time_last_back;
         int time_last_rot;
+        int time_last_jump;
         int jump_start;
         GLuint buffer;
         GLuint uvbuffer;
         GLuint nsbuffer;
+        GLint uni_model;
         GLuint shader_program;
         std::vector<glm::vec3> vertices;
         std::vector<glm::vec2> uvs;
         std::vector<glm::vec3> normals;
+        float vel_x;
+        float vel_y;
+        float vel_z;
+        Collision collision_map;
 
         Player();
-        void init(char* filename, bool player, Team team, float x, float y);
+        void init(char* filename, Team team, float x, float y, Collision collision_map);
         void set_team(Team team);
-        void set_state(AiState state);
         void set_pos(float x, float y);
         void set_has_flag(bool val);
         void draw();
