@@ -1,9 +1,11 @@
 #include"common.h"
 #include"player.h"
+#include"ai.h"
 #include"map.h"
 #include"collision.h"
 
 Player player;
+AI ai;
 Map map;
 Collision collision;
 
@@ -24,12 +26,18 @@ void display(void) {
     // Sticky/behind camera 
     float cam_pos_x = player.x-(3*sin(player.angle*PI/180));
     float cam_pos_y = player.y-(3*cos(player.angle*PI/180));
+    float cam_pos_z;
+    if(player.z >= -1.0) { 
+        cam_pos_z = player.z+2;
+    } else {
+        cam_pos_z = 3.0;
+    }
 
-    glm::vec2 cam_pos = glm::vec2(cam_pos_x, cam_pos_y);
+    glm::vec3 cam_pos = glm::vec3(cam_pos_x, cam_pos_y, cam_pos_z);
     glm::normalize(cam_pos);
     gluLookAt(
         cam_pos[0], // Position x
-        player.z+2, // Position z
+        cam_pos[2], // Position z
         cam_pos[1], // Position y
         player.x,   // Look at x
         player.z+1.0,        // Look at z
@@ -46,11 +54,12 @@ void display(void) {
     glEnable(GL_DEPTH_TEST);
 
     // Cull the back faces of the models
-    /*glEnable(GL_CULL_FACE);
-    glCullFace(GL_BACK);*/
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_BACK);
 
     map.draw();
     player.draw();
+    ai.draw();
     /*if(collision.on_floor(player.x, player.y)) {
         std::cout << "Player is on floor" << std::endl;
     }
@@ -98,6 +107,7 @@ void setup(void)
 
     map.init("models/map1.obj");
     collision.init("models/map1.obj");
+    ai.init((char*)"models/ninja.obj", Team::RED, 22.5, 8.0, collision);
     player.init((char*)"models/ninja.obj", Team::BLUE, 22.5, 6.5, collision);
 
     glutSwapBuffers();

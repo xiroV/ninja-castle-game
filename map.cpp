@@ -125,7 +125,6 @@ void Map::init(std::string filename) {
     glBindBuffer(GL_ARRAY_BUFFER, this->vbo);
     glBufferData(GL_ARRAY_BUFFER, this->vs.size() * sizeof(glm::vec3), &this->vs[0], GL_STATIC_DRAW);
     
-    //GLuint this->uvbuffer;
     glGenBuffers(1, &this->uvbuffer);
     glBindBuffer(GL_ARRAY_BUFFER, this->uvbuffer);
     glBufferData(GL_ARRAY_BUFFER, this->vs.size() * sizeof(glm::vec2), &this->uvs[0], GL_STATIC_DRAW);
@@ -188,8 +187,6 @@ void Map::draw() {
     glMaterialfv(GL_FRONT, GL_DIFFUSE, map_diff);
     glMaterialfv(GL_FRONT, GL_SPECULAR, map_spec);
     glMaterialfv(GL_FRONT, GL_SHININESS, map_shin);
-
-
 
     glDrawArrays(GL_TRIANGLES, 0, this->vs.size());
 

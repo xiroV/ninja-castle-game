@@ -1,7 +1,7 @@
 #include "common.h"
 #include "collision.h"
 
-class Player {
+class AI {
     public:
         Team team;
         float x;
@@ -32,7 +32,7 @@ class Player {
         float vel_z;
         Collision collision_map;
 
-        Player();
+        AI();
         void init(char* filename, Team team, float x, float y, Collision collision_map);
         void set_team(Team team);
         void set_pos(float x, float y);

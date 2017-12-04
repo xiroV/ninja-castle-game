@@ -1,11 +1,11 @@
-#include "player.h"
+#include "ai.h"
 
-float player_ambi[] = {0.0, 0.0, 0.0, 0.0};
-float player_diff[] = {0.3, 0.3, 0.3, 1.0};
-float player_spec[] = {0.1, 0.1, 0.1, 1.0};
-float player_shin[] = {10};
+float ai_ambi[] = {0.0, 0.0, 0.0, 0.0};
+float ai_diff[] = {0.8, 0.3, 0.3, 1.0};
+float ai_spec[] = {0.1, 0.1, 0.1, 1.0};
+float ai_shin[] = {10};
 
-const char* player_vertex_source = R"glsl(
+const char* ai_vertex_source = R"glsl(
     #version 150 core
 
     in vec3 position;
@@ -16,7 +16,7 @@ const char* player_vertex_source = R"glsl(
     }
 )glsl";
 
-const char* player_fragment_source = R"glsl(
+const char* ai_fragment_source = R"glsl(
     #version 150 core
 
     out vec4 outColor;
@@ -28,9 +28,9 @@ const char* player_fragment_source = R"glsl(
 )glsl";
 
 
-Player::Player() {}
+AI::AI() {}
 
-void Player::init(char* filename, Team team, float x, float y, Collision collision_map) {
+void AI::init(char* filename, Team team, float x, float y, Collision collision_map) {
     FILE *fp;
 
     this->collision_map = collision_map;
@@ -131,12 +131,12 @@ void Player::init(char* filename, Team team, float x, float y, Collision collisi
 
     // Vertex Shader
     GLuint vertex_shader = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(vertex_shader, 1, &player_vertex_source, NULL);
+    glShaderSource(vertex_shader, 1, &ai_vertex_source, NULL);
     glCompileShader(vertex_shader);
 
     // Fragment Shader
     GLuint fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fragment_shader, 1, &player_fragment_source, NULL);
+    glShaderSource(fragment_shader, 1, &ai_fragment_source, NULL);
     glCompileShader(fragment_shader);
 
     // Shader Program
@@ -147,17 +147,17 @@ void Player::init(char* filename, Team team, float x, float y, Collision collisi
     //glLinkProgram(this->shader_program);
     //glUseProgram(this->shader_program);
 
-    /*glEnableVertexAttribArray(0);
+    /*glEnableVertexAttribArray(3);
     glBindBuffer(GL_ARRAY_BUFFER, this->buffer);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
+    glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
     glEnableVertexAttribArray(1);
     glBindBuffer(GL_ARRAY_BUFFER, this->uvbuffer);
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, 0);
 
-    glEnableVertexAttribArray(2);
+    glEnableVertexAttribArray(4);
     glBindBuffer(GL_ARRAY_BUFFER, this->nsbuffer);
-    glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, 0);*/
+    glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, 0, 0);*/
 
     this->team = team;
     this->x = x;
@@ -179,18 +179,16 @@ void Player::init(char* filename, Team team, float x, float y, Collision collisi
     this->vel_z = 0.0;
 }
 
-void Player::draw() {
-
-
+void AI::draw() {
     //glUseProgram(this->shader_program);
 
-    glEnableVertexAttribArray(0);
+    glEnableVertexAttribArray(3);
     glBindBuffer(GL_ARRAY_BUFFER, this->buffer);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
+    glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
-    glEnableVertexAttribArray(2);
+    glEnableVertexAttribArray(4);
     glBindBuffer(GL_ARRAY_BUFFER, this->nsbuffer);
-    glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, 0);
+    glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
     int cur_time = glutGet(GLUT_ELAPSED_TIME);
     bool changed = false;
@@ -245,10 +243,10 @@ void Player::draw() {
     // Apply rotation transformation
     //glUniformMatrix4fv(this->uni_model, 1, GL_FALSE, glm::value_ptr(model));
 
-    glMaterialfv(GL_FRONT, GL_AMBIENT, player_ambi);
-    glMaterialfv(GL_FRONT, GL_DIFFUSE, player_diff);
-    glMaterialfv(GL_FRONT, GL_SPECULAR, player_spec);
-    glMaterialfv(GL_FRONT, GL_SHININESS, player_shin);
+    glMaterialfv(GL_FRONT, GL_AMBIENT, ai_ambi);
+    glMaterialfv(GL_FRONT, GL_DIFFUSE, ai_diff);
+    glMaterialfv(GL_FRONT, GL_SPECULAR, ai_spec);
+    glMaterialfv(GL_FRONT, GL_SHININESS, ai_shin);
 
     glDrawArrays(GL_TRIANGLES, 0, this->vertices.size());
 
@@ -298,10 +296,6 @@ void Player::draw() {
             std::cout << "Position: " << this->x << " " << this->y << " " << this->z << std::endl;
             std::cout << "Velocity: " << this->vel_z << std::endl;
             //std::cout << "Ray: " << ray_x << " " << ray_y << std::endl; 
-
-            if(this->collision_map.on_floor(this->x, this->y)) {
-                std::cout << "PLAYER_ON_FLOOR" << std::endl;
-            }
 
             if(this->collision_map.wall_hit_x(ray_x, ray_y)) {
                 //std::cout << "Collision x" << std::endl;
@@ -358,8 +352,8 @@ void Player::draw() {
         changed = true;
     }
 
-    glDisableVertexAttribArray(0);    
-    glDisableVertexAttribArray(2);
+    glDisableVertexAttribArray(3);    
+    glDisableVertexAttribArray(4);
 
 
     if(changed) {
@@ -379,36 +373,36 @@ void Player::draw() {
     }
 }
 
-void Player::set_team(Team team) {
+void AI::set_team(Team team) {
     this->team = team;
 }
 
-void Player::set_pos(float x, float y) {
+void AI::set_pos(float x, float y) {
     this->x = x;
     this->y = y;
 }
 
-void Player::set_has_flag(bool val) {
+void AI::set_has_flag(bool val) {
     this->has_flag = val;
 }
 
-void Player::set_moving(bool val) {
+void AI::set_moving(bool val) {
     this->moving = val;
 }
 
-void Player::set_rotating_left(bool val) {
+void AI::set_rotating_left(bool val) {
     this->rotating_left = val;
 }
 
-void Player::set_rotating_right(bool val) {
+void AI::set_rotating_right(bool val) {
     this->rotating_right = val;    
 }
 
-void Player::set_backing(bool val) {
+void AI::set_backing(bool val) {
     this->backing = val;
 }
 
-void Player::set_jumping(bool val) {
+void AI::set_jumping(bool val) {
     if(val) {
         this->jumping = true;
         if(this->z == 0) {
@@ -420,9 +414,9 @@ void Player::set_jumping(bool val) {
     }
 }
 
-void Player::respawn() {
+void AI::respawn() {
     this->x = 22.5;
-    this->y = 7.0;
+    this->y = 56.0;
     this->z = 0.0;
 
 }
