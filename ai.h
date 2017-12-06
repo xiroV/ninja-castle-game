@@ -22,6 +22,7 @@ class AI {
         GLuint buffer;
         GLuint uvbuffer;
         GLuint nsbuffer;
+        GLuint vao;
         GLint uni_model;
         GLuint shader_program;
         std::vector<glm::vec3> vertices;
@@ -31,6 +32,7 @@ class AI {
         float vel_y;
         float vel_z;
         Collision collision_map;
+        bool changed;
 
         AI();
         void init(char* filename, Team team, float x, float y, Collision collision_map);

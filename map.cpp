@@ -7,7 +7,7 @@ float map_shin[] = {30};
 
 //GLuint vao;
 
-const char* vertex_source = R"glsl(
+/*const char* vertex_source = R"glsl(
     #version 150 core
 
     in vec3 position;
@@ -27,7 +27,7 @@ const char* fragment_source = R"glsl(
     {
         outColor = vec4(0.5, 0.5, 0.5, 1.0);
     }
-)glsl";
+)glsl";*/
 
 
 Map::Map() {}
@@ -120,34 +120,43 @@ void Map::init(std::string filename) {
         this->ns.push_back(normal);
     }
 
+    glGenVertexArrays(1, &this->vao);
+    glBindVertexArray(this->vao);
 
     glGenBuffers(1, &this->vbo);
+    glEnableClientState(GL_VERTEX_ARRAY);
     glBindBuffer(GL_ARRAY_BUFFER, this->vbo);
     glBufferData(GL_ARRAY_BUFFER, this->vs.size() * sizeof(glm::vec3), &this->vs[0], GL_STATIC_DRAW);
+    glVertexPointer(3, GL_FLOAT, 0, 0);
     
-    glGenBuffers(1, &this->uvbuffer);
+    /*glGenBuffers(1, &this->uvbuffer);
     glBindBuffer(GL_ARRAY_BUFFER, this->uvbuffer);
     glBufferData(GL_ARRAY_BUFFER, this->vs.size() * sizeof(glm::vec2), &this->uvs[0], GL_STATIC_DRAW);
-    
+    */
+
     glGenBuffers(1, &this->nsbuffer);
+    glEnableClientState(GL_NORMAL_ARRAY);
     glBindBuffer(GL_ARRAY_BUFFER, this->nsbuffer);
     glBufferData(GL_ARRAY_BUFFER, this->ns.size() * sizeof(glm::vec3), &this->ns[0], GL_STATIC_DRAW);
  
+    glNormalPointer(GL_FLOAT, 0, 0);
 
     // Vertex Shader
-    GLuint vertex_shader = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(vertex_shader, 1, &vertex_source, NULL);
-    glCompileShader(vertex_shader);
+    //GLuint vertex_shader = glCreateShader(GL_VERTEX_SHADER);
+    //glShaderSource(vertex_shader, 1, &vertex_source, NULL);
+    //glCompileShader(vertex_shader);
 
     // Fragment Shader
-    GLuint fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fragment_shader, 1, &fragment_source, NULL);
-    glCompileShader(fragment_shader);
+    //GLuint fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
+    //glShaderSource(fragment_shader, 1, &fragment_source, NULL);
+    //glCompileShader(fragment_shader);
     
     // Shader Program
-    this->shader_program = glCreateProgram();
+    /*this->shader_program = glCreateProgram();
     glAttachShader(this->shader_program, vertex_shader);
-    glAttachShader(this->shader_program, fragment_shader);
+    glAttachShader(this->shader_program, fragment_shader);*/
+
+    std::cout << "Map initialized" << std::endl;
 }
 
 void Map::draw() {
@@ -156,9 +165,9 @@ void Map::draw() {
 
     //glPointSize(5.0);
 
-    //glGenVertexArrays(1, &vao);
+    /*glGenVertexArrays(1, &vao);
 
-    //glBindVertexArray(vao);
+    glBindVertexArray(vao);*/
 
 
     //glBufferData(GL_ARRAY_BUFFER, this->vs.size() * sizeof(glm::vec3), &this->vs[0], GL_STATIC_DRAW);
@@ -166,22 +175,26 @@ void Map::draw() {
     //glDrawArrays(GL_TRIANGLES, 0, this->vs.size());
 
     //glLinkProgram(shader_program);
-    glUseProgram(this->shader_program);
+    //glUseProgram(this->shader_program);
 
     //GLint posAttrib = glGetAttribLocation(this->shader_program, "position");
 
 
-    glEnableVertexAttribArray(0);
-    glBindBuffer(GL_ARRAY_BUFFER, this->vbo);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
+    //glEnableVertexAttribArray(0);
+    //glBindBuffer(GL_ARRAY_BUFFER, this->vbo);
+    //glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
+
+    
 
     /*glEnableVertexAttribArray(1);
     glBindBuffer(GL_ARRAY_BUFFER, this->uvs);
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, 0);*/
 
-    glEnableVertexAttribArray(2);
+    /*glEnableVertexAttribArray(2);
     glBindBuffer(GL_ARRAY_BUFFER, this->nsbuffer);
-    glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, 0);
+    glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, 0);*/
+
+    glBindVertexArray(this->vao);
 
     glMaterialfv(GL_FRONT, GL_AMBIENT, map_ambi);
     glMaterialfv(GL_FRONT, GL_DIFFUSE, map_diff);
@@ -190,13 +203,16 @@ void Map::draw() {
 
     glDrawArrays(GL_TRIANGLES, 0, this->vs.size());
 
-    glDisableVertexAttribArray(0);    
+    //glDisableVertexAttribArray(0);    
     //glDisableVertexAttribArray(1);    
-    glDisableVertexAttribArray(2);    
+    //glDisableVertexAttribArray(2);    
 
     //glutSwapBuffers();  
 
     //glBufferData(GL_ARRAY_BUFFER, this->vs.size() * sizeof(glm::vec3), &this->vs[0], GL_STATIC_DRAW);
+    
+    glBindVertexArray(0);
+    std::cout << "Map drawn" << std::endl;
 }
 
 

@@ -9,6 +9,8 @@ AI ai;
 Map map;
 Collision collision;
 
+GLuint vao[3];
+
 // Drawing routine.
 void display(void) {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -36,15 +38,15 @@ void display(void) {
     glm::vec3 cam_pos = glm::vec3(cam_pos_x, cam_pos_y, cam_pos_z);
     glm::normalize(cam_pos);
     gluLookAt(
-        cam_pos[0], // Position x
-        cam_pos[2], // Position z
-        cam_pos[1], // Position y
-        player.x,   // Look at x
-        player.z+1.0,        // Look at z
-        player.y,   // Look at y
-        0.0,        // Up rotation
-        1.0,        // Up rotation
-        0.0         // Up rotation
+        cam_pos[0],  // Position x
+        cam_pos[2],  // Position z
+        cam_pos[1],  // Position y
+        player.x,    // Look at x
+        player.z+1.0,// Look at z
+        player.y,    // Look at y
+        0.0,         // Up rotation
+        1.0,         // Up rotation
+        0.0          // Up rotation
     );
 
     glPopMatrix();
@@ -57,17 +59,23 @@ void display(void) {
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
 
+    glPushMatrix();
     map.draw();
-    player.draw();
-    ai.draw();
-    /*if(collision.on_floor(player.x, player.y)) {
-        std::cout << "Player is on floor" << std::endl;
-    }
-    if(collision.wall_hit(player.x, player.y)) {
-        std::cout << "Player hit wall" << std::endl;
-    }*/
+    glPopMatrix();
 
-    glFlush(); 
+    glPushMatrix();
+    player.draw();
+    glPopMatrix();
+
+    glPushMatrix();
+    ai.draw();
+    glPopMatrix();
+
+    if(ai.changed || player.changed) {
+        glutPostRedisplay();
+    }
+
+    //glFlush(); 
     glutSwapBuffers();
 }
 
@@ -86,6 +94,7 @@ void setup(void)
     glEnable(GL_LIGHT0);
 	glEnable(GL_BLEND); // Enable blending.
     glEnable(GL_MULTISAMPLE); // Enable multisampling.
+    glEnableClientState(GL_VERTEX_ARRAY);
 
     // Define light vectors for LIGHT0
     float ambient[] = {1.0, 1.0, 1.0, 1.0};
@@ -104,13 +113,16 @@ void setup(void)
     glEnable(GL_LINE_SMOOTH);
     glShadeModel(GL_SMOOTH);
 
-
     map.init("models/map1.obj");
     collision.init("models/map1.obj");
     ai.init((char*)"models/ninja.obj", Team::RED, 22.5, 8.0, collision);
     player.init((char*)"models/ninja.obj", Team::BLUE, 22.5, 6.5, collision);
 
-    glutSwapBuffers();
+    std::cout << "Setup done" << std::endl;
+
+    //glutSwapBuffers();
+    //glutPostRedisplay();
+    glFlush();
 }
 
 // OpenGL window reshape routine.

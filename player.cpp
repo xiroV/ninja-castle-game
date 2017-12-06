@@ -5,7 +5,7 @@ float player_diff[] = {0.3, 0.3, 0.3, 1.0};
 float player_spec[] = {0.1, 0.1, 0.1, 1.0};
 float player_shin[] = {10};
 
-const char* player_vertex_source = R"glsl(
+/*const char* player_vertex_source = R"glsl(
     #version 150 core
 
     in vec3 position;
@@ -25,13 +25,15 @@ const char* player_fragment_source = R"glsl(
     {
         outColor = vec4(0.0, 0.0, 1.0, 1.0);
     }
-)glsl";
+)glsl";*/
 
 
 Player::Player() {}
 
 void Player::init(char* filename, Team team, float x, float y, Collision collision_map) {
     FILE *fp;
+
+    std::cout << "Initializing player" << std::endl;
 
     this->collision_map = collision_map;
 
@@ -115,22 +117,40 @@ void Player::init(char* filename, Team team, float x, float y, Collision collisi
         this->normals.push_back(normal);
     }
 
+    // Generate vao
+    glGenVertexArrays(1, &this->vao);
+
+    // BEGIN bind to vao
+    glBindVertexArray(this->vao);
+
     // Generate model buffers
     glGenBuffers(1, &this->buffer);
+
+    glEnableClientState(GL_VERTEX_ARRAY);
+
     glBindBuffer(GL_ARRAY_BUFFER, this->buffer);
-    glBufferData(GL_ARRAY_BUFFER, this->vertices.size() * sizeof(glm::vec3), &this->vertices[0], GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, this->vertices.size() * sizeof(glm::vec3), NULL, GL_STATIC_DRAW);
+
+
+    glBufferSubData(GL_ARRAY_BUFFER, 0, this->vertices.size() * sizeof(glm::vec3), &this->vertices[0]);
+    
+    glVertexPointer(3, GL_FLOAT, 0, 0);
+
+    //std::cout << "player_buffer=" << this->buffer << std::endl;
 
     /*glGenBuffers(1, &this->uvbuffer);
     glBindBuffer(GL_ARRAY_BUFFER, this->uvbuffer);
     glBufferData(GL_ARRAY_BUFFER, this->uvs.size() * sizeof(glm::vec2), &this->uvs[0], GL_STATIC_DRAW);*/
     
     glGenBuffers(1, &this->nsbuffer);
+    glEnableClientState(GL_NORMAL_ARRAY);
     glBindBuffer(GL_ARRAY_BUFFER, this->nsbuffer);
     glBufferData(GL_ARRAY_BUFFER, this->normals.size() * sizeof(glm::vec3), &this->normals[0], GL_STATIC_DRAW);
- 
+
+    glNormalPointer(GL_FLOAT, 0, 0);
 
     // Vertex Shader
-    GLuint vertex_shader = glCreateShader(GL_VERTEX_SHADER);
+    /*GLuint vertex_shader = glCreateShader(GL_VERTEX_SHADER);
     glShaderSource(vertex_shader, 1, &player_vertex_source, NULL);
     glCompileShader(vertex_shader);
 
@@ -142,20 +162,20 @@ void Player::init(char* filename, Team team, float x, float y, Collision collisi
     // Shader Program
     this->shader_program = glCreateProgram();
     glAttachShader(this->shader_program, vertex_shader);
-    glAttachShader(this->shader_program, fragment_shader);
+    glAttachShader(this->shader_program, fragment_shader);*/
     //glBindFragDataLocation(this->shader_program, 0, "outColor");
     //glLinkProgram(this->shader_program);
     //glUseProgram(this->shader_program);
 
     /*glEnableVertexAttribArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, this->buffer);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);*/
 
-    glEnableVertexAttribArray(1);
+    /*glEnableVertexAttribArray(1);
     glBindBuffer(GL_ARRAY_BUFFER, this->uvbuffer);
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, 0);
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, 0);*/
 
-    glEnableVertexAttribArray(2);
+    /*glEnableVertexAttribArray(2);
     glBindBuffer(GL_ARRAY_BUFFER, this->nsbuffer);
     glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, 0);*/
 
@@ -177,23 +197,28 @@ void Player::init(char* filename, Team team, float x, float y, Collision collisi
     this->vel_x = 0.0;
     this->vel_y = 0.0;
     this->vel_z = 0.0;
+    this->changed = true;
+
+    std::cout << "Player Initialized" << std::endl;
 }
 
 void Player::draw() {
-
+    this->changed = false;
 
     //glUseProgram(this->shader_program);
 
-    glEnableVertexAttribArray(0);
+    /*glEnableVertexAttribArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, this->buffer);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);*/
 
-    glEnableVertexAttribArray(2);
+    /*glEnableVertexAttribArray(2);
     glBindBuffer(GL_ARRAY_BUFFER, this->nsbuffer);
-    glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, 0);
-
+    glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, 0);*/
+    //glVertexPointer(3, GL_FLOAT, 0, NULL); 
+    //glVertexPointer(3, GL_FLOAT, sizeof(glm::vec3), &this->vertices); 
+    glBindVertexArray(this->vao);
+    
     int cur_time = glutGet(GLUT_ELAPSED_TIME);
-    bool changed = false;
 
     float gravity = 0.02;
 
@@ -205,18 +230,18 @@ void Player::draw() {
                 this->z += vel_z;
             }
         }
-        changed = true;
+        this->changed = true;
     }
 
     // Calculate gravity 
     if(this->jumping || this->z > 0.0) {
         if(cur_time - this->time_last_jump > 20) {
-            if(!changed) {
+            if(!this->changed) {
                 this->vel_z -= gravity;
                 this->z += vel_z;
             }
         }
-        changed = true;
+        this->changed = true;
     }
 
     if(this->z <= 0.0 && this->collision_map.on_floor(this->x, this->y)) {
@@ -263,7 +288,7 @@ void Player::draw() {
                 this->angle = 0;
             }
         }
-        changed = true;
+        this->changed = true;
     }
 
     // Right Rotation
@@ -274,12 +299,12 @@ void Player::draw() {
                 this->angle = 360;
             }
         }
-        changed = true;
+        this->changed = true;
     }
 
     // Movement
     //if(this->moving && this->y < MAP_SIZE_Y && this->y > 0 && this->x < MAP_SIZE_X && this->x > 0) {
-    if(this->moving && this->z >= -1.0) {
+    if(this->moving && this->z >= -4.0) {
         if(cur_time - this->time_last_move > CHAR_MOVE_FRAMERATE) {
 
             // Calculate new position based on angle
@@ -298,10 +323,6 @@ void Player::draw() {
             std::cout << "Position: " << this->x << " " << this->y << " " << this->z << std::endl;
             std::cout << "Velocity: " << this->vel_z << std::endl;
             //std::cout << "Ray: " << ray_x << " " << ray_y << std::endl; 
-
-            if(this->collision_map.on_floor(this->x, this->y)) {
-                std::cout << "PLAYER_ON_FLOOR" << std::endl;
-            }
 
             if(this->collision_map.wall_hit_x(ray_x, ray_y)) {
                 //std::cout << "Collision x" << std::endl;
@@ -324,11 +345,11 @@ void Player::draw() {
                 this->y = CHAR_SIZE/2+2;
             }*/
         }
-        changed = true;
+        this->changed = true;
     }
 
     // Movement (backwards)
-    if(this->backing
+    /*if(this->backing
             && this->y < MAP_SIZE_Y
             && this->y > 0
             && this->x < MAP_SIZE_X
@@ -355,14 +376,11 @@ void Player::draw() {
                 this->y = CHAR_SIZE/2+2;
             }
         }
-        changed = true;
-    }
+        this->changed = true;
+    }*/
 
-    glDisableVertexAttribArray(0);    
-    glDisableVertexAttribArray(2);
-
-
-    if(changed) {
+    
+    if(this->changed) {
         if(cur_time - this->time_last_back > CHAR_BACK_FRAMERATE) {
             this->time_last_back = cur_time;
         }
@@ -375,8 +393,13 @@ void Player::draw() {
         if(cur_time - this->time_last_jump > 20) {
             this->time_last_jump = cur_time;
         }
-        glutPostRedisplay();
     }
+
+    glBindVertexArray(0);
+    //glDisableVertexAttribArray(0);    
+    //glDisableVertexAttribArray(2);
+
+    std::cout << "Player drawn: " << this->x << " " << this->y << " " << this->z << std::endl;
 }
 
 void Player::set_team(Team team) {

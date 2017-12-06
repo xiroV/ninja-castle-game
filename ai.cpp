@@ -5,7 +5,7 @@ float ai_diff[] = {0.8, 0.3, 0.3, 1.0};
 float ai_spec[] = {0.1, 0.1, 0.1, 1.0};
 float ai_shin[] = {10};
 
-const char* ai_vertex_source = R"glsl(
+/*const char* player_vertex_source = R"glsl(
     #version 150 core
 
     in vec3 position;
@@ -16,7 +16,7 @@ const char* ai_vertex_source = R"glsl(
     }
 )glsl";
 
-const char* ai_fragment_source = R"glsl(
+const char* player_fragment_source = R"glsl(
     #version 150 core
 
     out vec4 outColor;
@@ -25,7 +25,7 @@ const char* ai_fragment_source = R"glsl(
     {
         outColor = vec4(0.0, 0.0, 1.0, 1.0);
     }
-)glsl";
+)glsl";*/
 
 
 AI::AI() {}
@@ -57,10 +57,10 @@ void AI::init(char* filename, Team team, float x, float y, Collision collision_m
             glm::vec3 vertex;
             fscanf(fp, "%f %f %f\n", &vertex.x, &vertex.y, &vertex.z);
             temp_v.push_back(vertex);
-        /*} else if (strcmp(ch, "vt") == 0) {
+        } else if (strcmp(ch, "vt") == 0) {
             glm::vec2 uv;
             fscanf(fp, "%f %f\n", &uv.x, &uv.y);
-            temp_vt.push_back(uv);*/
+            temp_vt.push_back(uv);
         } else if (strcmp(ch, "vn") == 0) {
             glm::vec3 normal;
             fscanf(fp, "%f %f %f\n", &normal.x, &normal.y, &normal.z);
@@ -86,9 +86,9 @@ void AI::init(char* filename, Team team, float x, float y, Collision collision_m
             vertex_indices.push_back(vertex_index[0]);
             vertex_indices.push_back(vertex_index[1]);
             vertex_indices.push_back(vertex_index[2]);
-            uv_indices.push_back(uv_index[0]);
+            /*uv_indices.push_back(uv_index[0]);
             uv_indices.push_back(uv_index[1]);
-            uv_indices.push_back(uv_index[2]);
+            uv_indices.push_back(uv_index[2]);*/
             normal_indices.push_back(normal_index[0]);
             normal_indices.push_back(normal_index[1]);
             normal_indices.push_back(normal_index[2]);
@@ -115,49 +115,80 @@ void AI::init(char* filename, Team team, float x, float y, Collision collision_m
         this->normals.push_back(normal);
     }
 
-    // Generate model buffers
-    glGenBuffers(1, &this->buffer);
-    glBindBuffer(GL_ARRAY_BUFFER, this->buffer);
-    glBufferData(GL_ARRAY_BUFFER, this->vertices.size() * sizeof(glm::vec3), &this->vertices[0], GL_STATIC_DRAW);
 
-    /*glGenBuffers(1, &this->uvbuffer);
+    // Generate vao
+    std::cout << "Generating vao" << std::endl;
+    glGenVertexArrays(1, &this->vao);
+
+    std::cout << "vao generated: " << this->vao << std::endl;
+
+    // BEGIN bind to vao
+    glBindVertexArray(this->vao);
+
+    // Generate model buffers
+    std::cout << "Generating vbo" << std::endl;
+    glGenBuffers(1, &this->buffer);
+    std::cout << "vbo generated: " << this->buffer << std::endl;
+
+    std::cout << "Enabling client state" << std::endl;
+    glEnableClientState(GL_VERTEX_ARRAY);
+
+    std::cout << "Binding to buffer" << std::endl;
+    glBindBuffer(GL_ARRAY_BUFFER, this->buffer);
+    glBufferData(GL_ARRAY_BUFFER, this->vertices.size() * sizeof(glm::vec3), NULL, GL_STATIC_DRAW);
+
+    std::cout << "Inserting data" << std::endl << this->vertices.size()*sizeof(glm::vec3) << std::endl;
+
+    glBufferSubData(GL_ARRAY_BUFFER, 0, this->vertices.size() * sizeof(glm::vec3), &this->vertices[0]);
+    
+    std::cout << "Vertex pointer" << std::endl;
+    glVertexPointer(3, GL_FLOAT, 0, 0);
+
+    //std::cout << "player_buffer=" << this->buffer << std::endl;
+
+    glGenBuffers(1, &this->uvbuffer);
     glBindBuffer(GL_ARRAY_BUFFER, this->uvbuffer);
-    glBufferData(GL_ARRAY_BUFFER, this->uvs.size() * sizeof(glm::vec2), &this->uvs[0], GL_STATIC_DRAW);*/
+    glBufferData(GL_ARRAY_BUFFER, this->uvs.size() * sizeof(glm::vec2), &this->uvs[0], GL_STATIC_DRAW);
     
     glGenBuffers(1, &this->nsbuffer);
+    glEnableClientState(GL_NORMAL_ARRAY);
     glBindBuffer(GL_ARRAY_BUFFER, this->nsbuffer);
     glBufferData(GL_ARRAY_BUFFER, this->normals.size() * sizeof(glm::vec3), &this->normals[0], GL_STATIC_DRAW);
- 
+
+    glNormalPointer(GL_FLOAT, 0, 0);
 
     // Vertex Shader
-    GLuint vertex_shader = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(vertex_shader, 1, &ai_vertex_source, NULL);
+    /*GLuint vertex_shader = glCreateShader(GL_VERTEX_SHADER);
+    glShaderSource(vertex_shader, 1, &player_vertex_source, NULL);
     glCompileShader(vertex_shader);
 
     // Fragment Shader
     GLuint fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fragment_shader, 1, &ai_fragment_source, NULL);
+    glShaderSource(fragment_shader, 1, &player_fragment_source, NULL);
     glCompileShader(fragment_shader);
 
     // Shader Program
     this->shader_program = glCreateProgram();
     glAttachShader(this->shader_program, vertex_shader);
-    glAttachShader(this->shader_program, fragment_shader);
+    glAttachShader(this->shader_program, fragment_shader);*/
     //glBindFragDataLocation(this->shader_program, 0, "outColor");
     //glLinkProgram(this->shader_program);
     //glUseProgram(this->shader_program);
 
-    /*glEnableVertexAttribArray(3);
+    /*glEnableVertexAttribArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, this->buffer);
-    glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, 0, 0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);*/
 
-    glEnableVertexAttribArray(1);
+    /*glEnableVertexAttribArray(1);
     glBindBuffer(GL_ARRAY_BUFFER, this->uvbuffer);
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, 0);
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, 0);*/
 
-    glEnableVertexAttribArray(4);
+    /*glEnableVertexAttribArray(2);
     glBindBuffer(GL_ARRAY_BUFFER, this->nsbuffer);
-    glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, 0, 0);*/
+    glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, 0);*/
+
+
+
 
     this->team = team;
     this->x = x;
@@ -177,21 +208,26 @@ void AI::init(char* filename, Team team, float x, float y, Collision collision_m
     this->vel_x = 0.0;
     this->vel_y = 0.0;
     this->vel_z = 0.0;
+    this->changed = true;
+
+    std::cout << "AI initialized" << std::endl;
 }
 
 void AI::draw() {
-    //glUseProgram(this->shader_program);
 
-    glEnableVertexAttribArray(3);
+   /* glEnableVertexAttribArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, this->buffer);
-    glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, 0, 0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
-    glEnableVertexAttribArray(4);
+    glEnableVertexAttribArray(2);
     glBindBuffer(GL_ARRAY_BUFFER, this->nsbuffer);
-    glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, 0, 0);
+    glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, 0);
+    //glVertexPointer(3, GL_FLOAT, 0, NULL); 
+    glVertexPointer(3, GL_FLOAT, sizeof(glm::vec3), &this->buffer); */
+    glBindVertexArray(this->vao);
 
     int cur_time = glutGet(GLUT_ELAPSED_TIME);
-    bool changed = false;
+    this->changed = false;
 
     float gravity = 0.02;
 
@@ -203,18 +239,18 @@ void AI::draw() {
                 this->z += vel_z;
             }
         }
-        changed = true;
+        this->changed = true;
     }
 
     // Calculate gravity 
     if(this->jumping || this->z > 0.0) {
         if(cur_time - this->time_last_jump > 20) {
-            if(!changed) {
+            if(!this->changed) {
                 this->vel_z -= gravity;
                 this->z += vel_z;
             }
         }
-        changed = true;
+        this->changed = true;
     }
 
     if(this->z <= 0.0 && this->collision_map.on_floor(this->x, this->y)) {
@@ -261,7 +297,7 @@ void AI::draw() {
                 this->angle = 0;
             }
         }
-        changed = true;
+        this->changed = true;
     }
 
     // Right Rotation
@@ -272,7 +308,7 @@ void AI::draw() {
                 this->angle = 360;
             }
         }
-        changed = true;
+        this->changed = true;
     }
 
     // Movement
@@ -297,6 +333,10 @@ void AI::draw() {
             std::cout << "Velocity: " << this->vel_z << std::endl;
             //std::cout << "Ray: " << ray_x << " " << ray_y << std::endl; 
 
+            if(this->collision_map.on_floor(this->x, this->y)) {
+                std::cout << "PLAYER_ON_FLOOR" << std::endl;
+            }
+
             if(this->collision_map.wall_hit_x(ray_x, ray_y)) {
                 //std::cout << "Collision x" << std::endl;
                 new_x = this->x;
@@ -318,11 +358,11 @@ void AI::draw() {
                 this->y = CHAR_SIZE/2+2;
             }*/
         }
-        changed = true;
+        this->changed = true;
     }
 
     // Movement (backwards)
-    if(this->backing
+    /*if(this->backing
             && this->y < MAP_SIZE_Y
             && this->y > 0
             && this->x < MAP_SIZE_X
@@ -349,14 +389,11 @@ void AI::draw() {
                 this->y = CHAR_SIZE/2+2;
             }
         }
-        changed = true;
-    }
+        this->changed = true;
+    }*/
 
-    glDisableVertexAttribArray(3);    
-    glDisableVertexAttribArray(4);
-
-
-    if(changed) {
+    
+    if(this->changed) {
         if(cur_time - this->time_last_back > CHAR_BACK_FRAMERATE) {
             this->time_last_back = cur_time;
         }
@@ -369,8 +406,14 @@ void AI::draw() {
         if(cur_time - this->time_last_jump > 20) {
             this->time_last_jump = cur_time;
         }
-        glutPostRedisplay();
+        //glutPostRedisplay();
     }
+
+    glBindVertexArray(0);
+    /*glDisableVertexAttribArray(0);    
+    glDisableVertexAttribArray(2);*/
+
+    std::cout << "AI drawn: " << this->x << " " << this->y << " " << this->z << std::endl;
 }
 
 void AI::set_team(Team team) {
@@ -416,7 +459,7 @@ void AI::set_jumping(bool val) {
 
 void AI::respawn() {
     this->x = 22.5;
-    this->y = 56.0;
+    this->y = 8.0;
     this->z = 0.0;
 
 }

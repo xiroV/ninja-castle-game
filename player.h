@@ -23,6 +23,7 @@ class Player {
         GLuint uvbuffer;
         GLuint nsbuffer;
         GLint uni_model;
+        GLuint vao;
         GLuint shader_program;
         std::vector<glm::vec3> vertices;
         std::vector<glm::vec2> uvs;
@@ -31,6 +32,7 @@ class Player {
         float vel_y;
         float vel_z;
         Collision collision_map;
+        bool changed;
 
         Player();
         void init(char* filename, Team team, float x, float y, Collision collision_map);
