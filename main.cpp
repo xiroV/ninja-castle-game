@@ -1,4 +1,5 @@
 #include"common.h"
+#include"character.h"
 #include"player.h"
 #include"ai.h"
 #include"map.h"
@@ -8,11 +9,16 @@ Player player;
 AI ai;
 Map map;
 Collision collision;
+int start_time = std::time(nullptr);
+int elapsed_time;
+int last_score_print_time;
 
 GLuint vao[3];
 
 // Drawing routine.
 void display(void) {
+    
+    elapsed_time = std::time(nullptr);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glLoadIdentity();
     
@@ -49,7 +55,6 @@ void display(void) {
         0.0          // Up rotation
     );
 
-    glPopMatrix();
 
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
@@ -69,7 +74,14 @@ void display(void) {
 
     glPushMatrix();
     ai.draw();
+    ai.ai();
     glPopMatrix();
+
+
+    if((elapsed_time-start_time) % 5 == 0 && (elapsed_time-start_time != last_score_print_time)) {
+        std::cout << "Points; Player " << player.time_in_center << " - Computer " << ai.time_in_center << std::endl;
+        last_score_print_time = elapsed_time-start_time;
+    }
 
     if(ai.changed || player.changed) {
         glutPostRedisplay();
@@ -82,16 +94,18 @@ void display(void) {
 // Initialization routine.
 void setup(void) 
 {
-
     std::cout << "Setup" << std::endl;
+    glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
+    glEnable(GL_LIGHTING);
+    glEnable(GL_LIGHT0);
+    glEnable(GL_COLOR_MATERIAL);
 
     // Sky color
     glClearColor(0.67578125, 0.87109375, 0.96484375, 1.0); 
-
     // Turn on OpenGL lighting.
-    glEnable(GL_LIGHTING);
+    //glEnable(GL_LIGHTING);
     glEnable(GL_NORMALIZE);
-    glEnable(GL_LIGHT0);
+    //glEnable(GL_LIGHT0);
 	glEnable(GL_BLEND); // Enable blending.
     glEnable(GL_MULTISAMPLE); // Enable multisampling.
     glEnableClientState(GL_VERTEX_ARRAY);
@@ -100,7 +114,7 @@ void setup(void)
     float ambient[] = {1.0, 1.0, 1.0, 1.0};
     float diffuse[] = {0.6, 0.6, 0.6, 1.0};
     float specular[] = {0.3, 0.3, 0.3, 1.0};
-    float position[] = {10.0, 15.0, 10.0};
+    float position[] = {22.5, 31.0, 10.0};
 
     glLightfv(GL_LIGHT0, GL_AMBIENT, ambient);
     glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuse);
@@ -115,8 +129,8 @@ void setup(void)
 
     map.init("models/map1.obj");
     collision.init("models/map1.obj");
-    ai.init((char*)"models/ninja.obj", Team::RED, 22.5, 8.0, collision);
-    player.init((char*)"models/ninja.obj", Team::BLUE, 22.5, 6.5, collision);
+    player.init((unsigned int)0, (char*)"models/ninja.obj", Team::BLUE, 22.5, 6.5, &collision);
+    ai.init((unsigned int)1, (char*)"models/ninja.obj", Team::RED, 22.5, 8.0, &collision);
 
     std::cout << "Setup done" << std::endl;
 

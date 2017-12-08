@@ -1,8 +1,10 @@
-#include "common.h"
-#include "collision.h"
+//#include "common.h"
+//#include "collision.h"
+#include "character.h"
 
-class Player {
-    public:
+class Player: public Character {
+/*    public:
+        int id;
         Team team;
         float x;
         float y;
@@ -35,7 +37,10 @@ class Player {
         bool changed;
 
         Player();
-        void init(char* filename, Team team, float x, float y, Collision collision_map);
+    */
+    /*public:
+        Player():Character() {};
+        void init(int id, char* filename, Team team, float x, float y, Collision collision_map);
         void set_team(Team team);
         void set_pos(float x, float y);
         void set_has_flag(bool val);
@@ -45,6 +50,6 @@ class Player {
         void set_backing(bool val);
         void set_rotating_left(bool val);
         void set_rotating_right(bool val);
-        void respawn();
+        void respawn();*/
 };
 

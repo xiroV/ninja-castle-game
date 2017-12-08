@@ -4,11 +4,14 @@ CFLAGS = -Wall
 
 all:	game
 
-game: main.o player.o map.o collision.o ai.o
-	$(CC) -o $@ main.o player.o map.o collision.o ai.o $(LIBS)
+game: main.o player.o map.o collision.o ai.o character.o loader/material.o
+	$(CC) -o $@ main.o player.o map.o collision.o ai.o character.o material.o $(LIBS)
 
 %.o: %.cpp
 	$(CC) -c $(CFLAGS) $<
 
+loader/%.o: %.cpp
+	$(CC) -c $(CFLAGS) $<
+
 clean:
-	rm -f game *.o
+	rm -f game *.o loader/*.o

@@ -11,7 +11,7 @@
 #include<GL/glext.h>
 #include<math.h>
 #include<iostream>
-#include<time.h>
+#include<ctime>
 #include<vector>
 #include<string.h>
 #include<fstream>
@@ -22,8 +22,8 @@
 #define CHAR_MOVE_SPEED 0.3
 #define CHAR_MOVE_FRAMERATE 30
 #define CHAR_BACK_FRAMERATE 50
-#define CHAR_ROT_SPEED 1
-#define CHAR_ROT_FRAMERATE 1
+#define CHAR_ROT_SPEED 2
+#define CHAR_ROT_FRAMERATE 2
 #define GRAVITY 0.5
 
 #define PI 3.14159265

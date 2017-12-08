@@ -1,3 +1,4 @@
+#include"loader/material.h"
 #include"map.h"
 
 float map_ambi[] = {0.3, 0.3, 0.3, 1.0};
@@ -5,40 +6,16 @@ float map_diff[] = {0.5, 0.5, 0.5, 1.0};
 float map_spec[] = {0.0, 0.0, 0.0, 1.0};
 float map_shin[] = {30};
 
-//GLuint vao;
-
-/*const char* vertex_source = R"glsl(
-    #version 150 core
-
-    in vec3 position;
-
-    void main()
-    {
-        gl_Position = vec4(position, 1.0);
-    }
-)glsl";
-
-const char* fragment_source = R"glsl(
-    #version 150 core
-
-    out vec4 outColor;
-
-    void main()
-    {
-        outColor = vec4(0.5, 0.5, 0.5, 1.0);
-    }
-)glsl";*/
-
-
 Map::Map() {}
 
 void Map::init(std::string filename) {
     std::ifstream inFile;
 
-    std::vector<unsigned int> vertex_indices, uv_indices, normal_indices;
+    std::vector<unsigned int> vertex_indices, normal_indices;
+    std::vector<glm::vec4> colors;
     std::vector<glm::vec3> temp_v;
-    std::vector<glm::vec2> temp_vt;
     std::vector<glm::vec3> temp_vn;
+    std::string cur_mat;
 
     std::cout << "Reading map" << std::endl;
 
@@ -59,11 +36,13 @@ void Map::init(std::string filename) {
             inFile >> vertex.z;
 
             temp_v.push_back(vertex);
-        /*} else if (strcmp(ch, "vt") == 0) {
-            std::cout << "lla" <<std::endl;
-            glm::vec2 uv;
-            fscanf(fp, "%f %f\n", &uv.x, &uv.y);
-            temp_vt.push_back(uv);*/
+
+        } else if(ch == "mtllib") {
+            inFile >> ch;
+            this->mtl.load(ch);
+        } else if(ch == "usemtl") {
+            inFile >> ch; 
+            cur_mat = ch;
         } else if (ch == "vn") {
             glm::vec3 normal;
 
@@ -97,6 +76,9 @@ void Map::init(std::string filename) {
             normal_indices.push_back(normal_index[0]);
             normal_indices.push_back(normal_index[1]);
             normal_indices.push_back(normal_index[2]);
+            colors.push_back(this->mtl.get(cur_mat).diffuse);
+            colors.push_back(this->mtl.get(cur_mat).diffuse);
+            colors.push_back(this->mtl.get(cur_mat).diffuse);
         }
     } // Done reading file
 
@@ -107,7 +89,6 @@ void Map::init(std::string filename) {
     // Now processing indices
     for(unsigned int i=0; i < vertex_indices.size(); i++) {
         unsigned int vertex_index = vertex_indices[i];
-        //unsigned int uv_index = uv_indices[i];
         unsigned int normal_index = normal_indices[i];
 
         glm::vec3 v = temp_v[vertex_index-1];
@@ -138,23 +119,13 @@ void Map::init(std::string filename) {
     glEnableClientState(GL_NORMAL_ARRAY);
     glBindBuffer(GL_ARRAY_BUFFER, this->nsbuffer);
     glBufferData(GL_ARRAY_BUFFER, this->ns.size() * sizeof(glm::vec3), &this->ns[0], GL_STATIC_DRAW);
- 
     glNormalPointer(GL_FLOAT, 0, 0);
 
-    // Vertex Shader
-    //GLuint vertex_shader = glCreateShader(GL_VERTEX_SHADER);
-    //glShaderSource(vertex_shader, 1, &vertex_source, NULL);
-    //glCompileShader(vertex_shader);
-
-    // Fragment Shader
-    //GLuint fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
-    //glShaderSource(fragment_shader, 1, &fragment_source, NULL);
-    //glCompileShader(fragment_shader);
-    
-    // Shader Program
-    /*this->shader_program = glCreateProgram();
-    glAttachShader(this->shader_program, vertex_shader);
-    glAttachShader(this->shader_program, fragment_shader);*/
+    glGenBuffers(1, &this->color_buffer);
+    glEnableClientState(GL_COLOR_ARRAY);
+    glBindBuffer(GL_ARRAY_BUFFER, this->color_buffer);
+    glBufferData(GL_ARRAY_BUFFER, colors.size() * sizeof(glm::vec4), &colors[0], GL_STATIC_DRAW);
+    glColorPointer(4, GL_FLOAT, 0, 0);
 
     std::cout << "Map initialized" << std::endl;
 }
@@ -196,10 +167,10 @@ void Map::draw() {
 
     glBindVertexArray(this->vao);
 
-    glMaterialfv(GL_FRONT, GL_AMBIENT, map_ambi);
+    /*glMaterialfv(GL_FRONT, GL_AMBIENT, map_ambi);
     glMaterialfv(GL_FRONT, GL_DIFFUSE, map_diff);
     glMaterialfv(GL_FRONT, GL_SPECULAR, map_spec);
-    glMaterialfv(GL_FRONT, GL_SHININESS, map_shin);
+    glMaterialfv(GL_FRONT, GL_SHININESS, map_shin);*/
 
     glDrawArrays(GL_TRIANGLES, 0, this->vs.size());
 
@@ -212,7 +183,6 @@ void Map::draw() {
     //glBufferData(GL_ARRAY_BUFFER, this->vs.size() * sizeof(glm::vec3), &this->vs[0], GL_STATIC_DRAW);
     
     glBindVertexArray(0);
-    std::cout << "Map drawn" << std::endl;
 }
 
 
