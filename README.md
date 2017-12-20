@@ -1,7 +1,11 @@
 # Ninja Castle
-Assignment for DM842 Computer Game Programming
+## Introduction
+Assignment for DM842 Computer Game Programming.
 
-Goal is to make a King of the Hill game, 3D platform style.
+The goal is to make a King of the Hill game, 3D platform style.
+
+The game is written in C++, and all 3D files have been made using
+the Open Source 3D suite [Blender][https://www.blender.org/].
 
 The current status:
 
@@ -30,6 +34,22 @@ and anyone who falls down the moat will respawn after 3 seconds.
 
 The player who reaches 500 points first, will win the match, and the game will restart.
 
+
+## Installation
+Tested on Linux only and have the following dependencies:
+ - OpenGL 4.3
+ - Glew
+ - Glut
+
+To install, enter the _src_ directory and type
+```
+make
+```
+
+To run, simply run the resulting `game` binary:
+```
+./game
+```
 
 ## Controls
  - Move around using the arrow keys
