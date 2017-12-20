@@ -66,9 +66,10 @@ void MaterialLoader::load(std::string filename) {
 }
 
 material_t MaterialLoader::get(std::string name) {
-    for(int i = 0; i < this->materials.size(); i++) {
+    for(unsigned int i = 0; i < this->materials.size(); i++) {
         if(this->materials[i].name == name) {
             return this->materials[i];
         }
     }
+    return this->materials[0];
 }

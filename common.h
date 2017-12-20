@@ -7,6 +7,7 @@
 #include<glm/gtc/matrix_transform.hpp>
 #include<glm/gtc/type_ptr.hpp>
 #include<GL/glew.h>
+#include<GL/glext.h>
 #include<GL/freeglut.h>
 #include<GL/glext.h>
 #include<math.h>
@@ -22,7 +23,7 @@
 #define CHAR_MOVE_SPEED 0.3
 #define CHAR_MOVE_FRAMERATE 30
 #define CHAR_BACK_FRAMERATE 50
-#define CHAR_ROT_SPEED 2
+#define CHAR_ROT_SPEED 1
 #define CHAR_ROT_FRAMERATE 2
 #define GRAVITY 0.5
 

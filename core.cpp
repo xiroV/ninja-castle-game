@@ -1,4 +1,4 @@
-#include"collision.h"
+#include"core.h"
 
 Collision::Collision() {}
 
@@ -13,8 +13,6 @@ void Collision::init(std::string filename) {
     std::vector<glm::vec3> temp_v;
     std::vector<glm::vec3> temp_vn;
     bool read = true;
-
-    std::cout << "Reading collision map" << std::endl;
 
     inFile.open(filename);
     if(!inFile) {
@@ -49,7 +47,8 @@ void Collision::init(std::string filename) {
 
             temp_vn.push_back(normal);
         } else if (ch == "f") {
-            unsigned int vertex_index[3], uv_index[3], normal_index[3];
+            unsigned int vertex_index[3], normal_index[3];
+            //unsigned int uv_index[3]
 
             for(int i = 0; i < 3; i++) {
                 inFile >> ch;
@@ -60,9 +59,9 @@ void Collision::init(std::string filename) {
                 std::string ch2 = ch.substr(s1+1, ch.length());
 
                 int s2 = ch2.find("/");
-                if(s2 > 0) {
+                /*if(s2 > 0) {
                     uv_index[i] = std::stoi(ch.substr(s1, s2));
-                }
+                }*/
 
                 normal_index[i] = std::stoi(ch2.substr(s2+1, ch.length()));
             }
@@ -90,8 +89,7 @@ void Collision::init(std::string filename) {
 
     inFile.close();
 
-    std::cout << "Done reading floor" << std::endl;
-    std::cout << "Read " << this->floor_verts.size() << " vertices" << std::endl;
+    std::cout << "Collision map intialized" << std::endl;
 }
 
 bool Collision::on_floor(float x, float y) {
@@ -127,7 +125,6 @@ bool Collision::wall_hit_x(float x, float y) {
         return false;
     }
     return !this->on_floor(x, y);
-
 }
 
 bool Collision::wall_hit_y(float x, float y) {
@@ -154,7 +151,6 @@ float Collision::player_distance(unsigned int id) {
     float ray_x = enemy.x + (sin(enemy.w*PI/180) * CHAR_MOVE_SPEED);
     float ray_y = enemy.y + (cos(enemy.w*PI/180) * CHAR_MOVE_SPEED);
 
-
     float distance = sqrt(
         pow(player.x-ray_x, 2) +
         pow(player.y-ray_y, 2) +
@@ -168,7 +164,7 @@ bool Collision::player_collision(unsigned int player) {
     // Set to true if the player collided with enemy
     // Used to set velocities on knock-back for character
     
-    if(this->player_distance(player) < 0.5) {
+    if(this->player_distance(player) < 1.0) {
         return true;
     }
 

@@ -63,32 +63,8 @@ void Character::init(unsigned int id, char* filename, Team team, float x, float 
 
             temp_vn.push_back(normal);
         } else if (ch == "f") {
-            unsigned int vertex_index[3], uv_index[3], normal_index[3];
-            /*fscanf(fp, "%d//%d %d//%d %d//%d\n",
-                    &vertex_index[0],
-                    //&uv_index[0],
-                    &normal_index[0],
-                    &vertex_index[1],
-                    //&uv_index[1],
-                    &normal_index[1],
-                    &vertex_index[2],
-                    //&uv_index[2],
-                    &normal_index[2]);
-
-            if(matches != 9) {
-                printf("Faces can't be read, try exporting with other options");
-                exit(1);
-            }
-
-            vertex_indices.push_back(vertex_index[0]);
-            vertex_indices.push_back(vertex_index[1]);
-            vertex_indices.push_back(vertex_index[2]);
-            uv_indices.push_back(uv_index[0]);
-            uv_indices.push_back(uv_index[1]);
-            uv_indices.push_back(uv_index[2]);
-            normal_indices.push_back(normal_index[0]);
-            normal_indices.push_back(normal_index[1]);
-            normal_indices.push_back(normal_index[2]);*/
+            unsigned int vertex_index[3], normal_index[3];
+            //unsigned int uv_index[3];
 
             for(int i = 0; i < 3; i++) {
                 inFile >> ch;
@@ -99,9 +75,9 @@ void Character::init(unsigned int id, char* filename, Team team, float x, float 
                 std::string ch2 = ch.substr(s1+1, ch.length());
 
                 int s2 = ch2.find("/");
-                if(s2 > 0) {
+                /*if(s2 > 0) {
                     uv_index[i] = std::stoi(ch.substr(s1, s2));
-                }
+                }*/
 
                 normal_index[i] = std::stoi(ch2.substr(s2+1, ch.length()));
             }
@@ -119,8 +95,6 @@ void Character::init(unsigned int id, char* filename, Team team, float x, float 
 
         }
     } // Done reading file
-
-
 
     inFile.close();
 
@@ -196,6 +170,8 @@ void Character::init(unsigned int id, char* filename, Team team, float x, float 
     this->dead_time = 0;
     this->time_in_center = 0.0;
 
+
+    std::cout << "Character initialized" << std::endl;
     this->respawn();
 }
 
@@ -205,7 +181,7 @@ void Character::draw() {
     glBindVertexArray(this->vao);
     
 
-    float gravity = 0.05;
+    float gravity = 0.04;
 
     // Movement to position 
     glTranslatef(this->x, this->z, this->y);
@@ -221,8 +197,12 @@ void Character::draw() {
     glDrawArrays(GL_TRIANGLES, 0, this->vertices.size());
 
 
-    if(this->dead && cur_time - this->dead_time > 5000) {
-        std::cout << cur_time - this->dead_time << std::endl;
+    if(this->dead && cur_time - this->dead_time > 3000) {
+        if(this->id == 0) {
+            std::cout << "Player respawned" << std::endl;
+        } else {
+            std::cout << "Computer respawned" << std::endl;
+        }
         this->dead = false;
         this->respawn();
         this->changed = true;
@@ -287,6 +267,11 @@ void Character::draw() {
     if(this->z < -14 && !this->dead) {
         this->dead = true;
         this->dead_time = cur_time;
+        if(this->id == 0) {
+            std::cout << "Player died - Respawning in 3 seconds" << std::endl;
+        } else {
+            std::cout << "Computer died - Respawning in 3 seconds" << std::endl;
+        }
     }
 
     // Left Rotation
@@ -325,6 +310,10 @@ void Character::draw() {
             float ray_x = this->x + (sin(this->angle*PI/180) * CHAR_MOVE_SPEED*2);
             float ray_y = this->y + (cos(this->angle*PI/180) * CHAR_MOVE_SPEED*2);
 
+            ray_x = this->x + (sin(this->angle*PI/180));
+            ray_y = this->y + (cos(this->angle*PI/180));
+
+
             if(this->id == 0) {
                 float left_ray_angle = this->angle + 90;
                 float right_ray_angle = this->angle - 90;
@@ -337,12 +326,12 @@ void Character::draw() {
                     left_ray_angle -= 360;
                 }
 
-                float ray_x = this->x + (sin(this->angle*PI/180)*5);
-                float ray_y = this->y + (cos(this->angle*PI/180)*5);
-                float left_ray_x = this->x + (sin(left_ray_angle*PI/180)*5);
-                float left_ray_y = this->y + (cos(left_ray_angle*PI/180)*5);
-                float right_ray_x = this->x + (sin(right_ray_angle*PI/180)*5);
-                float right_ray_y = this->y + (cos(right_ray_angle*PI/180)*5);
+                ray_x = this->x + (sin(this->angle*PI/180));
+                ray_y = this->y + (cos(this->angle*PI/180));
+                //float left_ray_x = this->x + (sin(left_ray_angle*PI/180)*5);
+                //float left_ray_y = this->y + (cos(left_ray_angle*PI/180)*5);
+                //float right_ray_x = this->x + (sin(right_ray_angle*PI/180)*5);
+                //float right_ray_y = this->y + (cos(right_ray_angle*PI/180)*5);
             }
 
             if(this->collision_map->wall_hit_x(ray_x, ray_y)) {

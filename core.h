@@ -1,7 +1,7 @@
 #include"common.h"
 
-#ifndef __collision_h_included__
-#define __collision_h_included__
+#ifndef __core_h_included__
+#define __core_h_included__
 
 class Collision {
     public:

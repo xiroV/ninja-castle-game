@@ -17,8 +17,6 @@ void Map::init(std::string filename) {
     std::vector<glm::vec3> temp_vn;
     std::string cur_mat;
 
-    std::cout << "Reading map" << std::endl;
-
     inFile.open(filename);
     if(!inFile) {
         std::cout << "Can't open map file " << filename << std::endl;
@@ -52,7 +50,8 @@ void Map::init(std::string filename) {
 
             temp_vn.push_back(normal);
         } else if (ch == "f") {
-            unsigned int vertex_index[3], uv_index[3], normal_index[3];
+            unsigned int vertex_index[3], normal_index[3];
+            //unsigned int uv_index[3];
 
             for(int i = 0; i < 3; i++) {
                 inFile >> ch;
@@ -63,9 +62,9 @@ void Map::init(std::string filename) {
                 std::string ch2 = ch.substr(s1+1, ch.length());
 
                 int s2 = ch2.find("/");
-                if(s2 > 0) {
+                /*if(s2 > 0) {
                     uv_index[i] = std::stoi(ch.substr(s1, s2));
-                }
+                }*/
 
                 normal_index[i] = std::stoi(ch2.substr(s2+1, ch.length()));
             }

@@ -3,7 +3,7 @@
 #include"player.h"
 #include"ai.h"
 #include"map.h"
-#include"collision.h"
+#include"core.h"
 
 Player player;
 AI ai;
@@ -13,13 +13,12 @@ int start_time = std::time(nullptr);
 int elapsed_time;
 int last_score_print_time;
 
-GLuint vao[3];
-
 // Drawing routine.
 void display(void) {
     
-    elapsed_time = std::time(nullptr);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    elapsed_time = std::time(nullptr);
+
     glLoadIdentity();
     
     glMatrixMode(GL_PROJECTION);
@@ -29,6 +28,7 @@ void display(void) {
 
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
+
 
 
     // Sticky/behind camera 
@@ -77,10 +77,26 @@ void display(void) {
     ai.ai();
     glPopMatrix();
 
-
+    glColor3f(0.0, 0.0, 0.0);
+    glRasterPos3f(10.0, 20.0, 10.0);
     if((elapsed_time-start_time) % 5 == 0 && (elapsed_time-start_time != last_score_print_time)) {
         std::cout << "Points; Player " << player.time_in_center << " - Computer " << ai.time_in_center << std::endl;
         last_score_print_time = elapsed_time-start_time;
+
+        if(player.time_in_center >= 500) {
+            std::cout << "Player won the game by " << player.time_in_center - ai.time_in_center << " points!" << std::endl;
+            ai.time_in_center = 0;
+            player.time_in_center = 0;
+            ai.respawn();
+            player.respawn();
+        }
+        if(ai.time_in_center >= 500) {
+            std::cout << "Computer won the game by " << ai.time_in_center - player.time_in_center << " points!" << std::endl;
+            ai.time_in_center = 0;
+            player.time_in_center = 0;
+            ai.respawn();
+            player.respawn();
+        }
     }
 
     if(ai.changed || player.changed) {
@@ -94,7 +110,6 @@ void display(void) {
 // Initialization routine.
 void setup(void) 
 {
-    std::cout << "Setup" << std::endl;
     glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
     glEnable(GL_LIGHTING);
     glEnable(GL_LIGHT0);
@@ -102,17 +117,14 @@ void setup(void)
 
     // Sky color
     glClearColor(0.67578125, 0.87109375, 0.96484375, 1.0); 
-    // Turn on OpenGL lighting.
-    //glEnable(GL_LIGHTING);
     glEnable(GL_NORMALIZE);
-    //glEnable(GL_LIGHT0);
 	glEnable(GL_BLEND); // Enable blending.
     glEnable(GL_MULTISAMPLE); // Enable multisampling.
     glEnableClientState(GL_VERTEX_ARRAY);
 
     // Define light vectors for LIGHT0
     float ambient[] = {1.0, 1.0, 1.0, 1.0};
-    float diffuse[] = {0.6, 0.6, 0.6, 1.0};
+    float diffuse[] = {0.8, 0.8, 0.8, 1.0};
     float specular[] = {0.3, 0.3, 0.3, 1.0};
     float position[] = {22.5, 31.0, 10.0};
 
@@ -132,10 +144,11 @@ void setup(void)
     player.init((unsigned int)0, (char*)"models/ninja.obj", Team::BLUE, 22.5, 6.5, &collision);
     ai.init((unsigned int)1, (char*)"models/ninja.obj", Team::RED, 22.5, 8.0, &collision);
 
-    std::cout << "Setup done" << std::endl;
+    std::cout << "Game initialization finished" << std::endl << std::endl;
+    std::cout << "- Stay on the platform in the middle to gain points." << std::endl;
+    std::cout << "- The player who first gets a score of 500 wins the game." << std::endl;
+    std::cout << "- Move using the Arrow keys, press Z to jump." << std::endl << std::endl;
 
-    //glutSwapBuffers();
-    //glutPostRedisplay();
     glFlush();
 }
 
@@ -226,7 +239,7 @@ int main(int argc, char **argv) {
     glutInitContextVersion(4, 3);
     glutInitContextProfile(GLUT_COMPATIBILITY_PROFILE);
 
-    glutInitDisplayMode(GLUT_SINGLE | GLUT_RGBA | GLUT_DEPTH); 
+    glutInitDisplayMode(GLUT_SINGLE | GLUT_RGBA | GLUT_DEPTH | GLUT_MULTISAMPLE); 
     glutInitWindowSize(1024, 768);
     glutInitWindowPosition(100, 100); 
     glutCreateWindow("Awesome Game");

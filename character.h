@@ -1,5 +1,5 @@
 #include "common.h"
-#include "collision.h"
+#include "core.h"
 #include "loader/material.h"
 
 #ifndef __character_h_included__
