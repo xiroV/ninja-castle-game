@@ -41,8 +41,9 @@ Tested on Linux only and have the following dependencies:
  - Glew
  - Glut
 
-To install, enter the _src_ directory and type
+To install, in a terminal emulator, enter
 ```
+cd ninja-castle-game/src
 make
 ```
 
