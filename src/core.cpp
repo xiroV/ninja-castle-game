@@ -102,16 +102,10 @@ bool Collision::on_floor(float x, float y) {
         p3.x = this->floor_verts[i+2].x;
         p3.y = this->floor_verts[i+2].z;
 
-        /*std::cout << "p1: " << p1.x << " " << p1.y << std::endl;
-        std::cout << "p2: " << p2.x << " " << p2.y << std::endl;
-        std::cout << "p3: " << p3.x << " " << p3.y << std::endl;
-        std::cout << x << " " << y << std::endl;*/
-
         // Barycentric coordinates
         float alpha = ((p2.y - p3.y) * (x - p3.x) + (p3.x - p2.x) * (y - p3.y)) / ((p2.y - p3.y)*(p1.x - p3.x) + (p3.x - p2.x) * (p1.y - p3.y));
         float beta = ((p3.y - p1.y) * (x - p3.x) + (p1.x - p3.x) * (y - p3.y)) / ((p2.y - p3.y)*(p1.x - p3.x) + (p3.x - p2.x)*(p1.y - p3.y));
         float gamma = 1.0f - alpha - beta;
-        //std::cout << alpha << " " << beta << " " << gamma << std::endl;
 
         if(alpha > 0.0 && beta > 0.0 && gamma > 0.0) {
             return true;
