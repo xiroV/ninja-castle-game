@@ -6,7 +6,7 @@
 #include<glm/vec2.hpp>
 #include<glm/gtc/matrix_transform.hpp>
 #include<glm/gtc/type_ptr.hpp>
-#include<GL/glew.h>
+#include<glew/include/GL/glew.h>
 #include<GL/glext.h>
 #include<GL/freeglut.h>
 #include<GL/glext.h>
