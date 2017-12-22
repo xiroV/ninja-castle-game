@@ -1,5 +1,5 @@
 CC = g++
-LIBS = -lGL -lglut -lGLU -lGLEW
+LIBS = -lGL -lglut -lGLU glew/lib64/libGLEW.a
 CFLAGS = -Wall
 
 all:	game
