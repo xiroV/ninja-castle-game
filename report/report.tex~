@@ -1,4 +1,4 @@
-% Created 2017-12-21 Thu 11:43
+% Created 2017-12-22 Fri 10:06
 \documentclass[12pt,a4paper,titlepage]{article}
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
@@ -94,7 +94,14 @@ report.
 Ninja Castle was developed in C++ using as few dependencies as possible,
 OpenGL being the most important one. It was planned to use \emph{modern} OpenGL
 for the higher control of shading and other interesting topics, but because
-of time constraints the end result is a mix of \emph{modern} and \emph{legacy} OpenGL.
+of time constraints the end result is rather \emph{modern} OpenGL with the used of 
+a bit of deprecated functionality, mainly the deprecated modelview
+transformation commands and the deprecated lighting commands.
+
+\#To be more specific, retained mode was used instead of the deprecated
+\#immediate mode functionality, all objects are stored in stored in \emph{buffer
+\#objects}, as defined to be compulsory in OpenGL 4.3, but deprecated modelview transformation commands are used, along with deprecated lighting commands.
+\#For this, a OpenGL 4.3 context was used with backward-compatibility enabled.
 
 Furthermore a few extension libraries was used to simplify certain OpenGL
 related tasks.
@@ -115,12 +122,15 @@ time. Below is a short summary of the overall structure.
 \begin{itemize}
 \item The Collision class in \emph{core.cpp} contains methods for collision
 and physics related functionality. The collision class will get feedback
-from the characters about their current position and rotation.
+from the characters about their current position and rotation. On
+initialization a collision map will be loaded, which will be described in
+detail in the \emph{Collision Detection} section.
 
 \item The Character class contains functionality related to initialization,
 drawing and movement of a character and utilizes some functionality of
 the Collision class e.g. checking for collisions with the other character
-and walls.
+and walls. Furthermore, most of the physics related to the characters are
+implemented here.
 
 \item The Player and AI classes inherits functionality of the Character
 class, with the AI class extending with the code for the AI.
@@ -135,8 +145,8 @@ store this data for usage on objects.
 as keyboard listeners. It also sets certain OpenGL parameters, calls the
 initialization procedures of the different classes, and calls the draw
 procedures of the different classes, where appropriate. Furthermore, the
-score of the individual characters, while calculated in the character class,
-is handled here.
+score of the individual characters, while calculated in the character
+class, is handled here.
 \end{itemize}
 
 \subsection*{Graphics}
@@ -162,6 +172,18 @@ as shown in figure \ref{fig:blender}. The eye/pupil-texture on the Ninja's
 eyeballs was dropped at a later stage in the project, since it was the only
 actual texture, and other parts of the project needed more attention.
 
+
+To use these figures with OpenGL, they were exported into Wavefront \emph{.obj} files,
+which is a plaintext format able to store information about a 3D model, such
+as vector and face information, corresponding material, texture (UV)
+coordinates and vector normals. Each line starting with a \emph{v} is a
+definition of a vector, and is followed by its 3 scalars/coordinates. The
+same applies to the normal vectors, except these are defined by \emph{vn}. Faces
+are defined by a line starting with \emph{f}, but are instead pointing to 3
+previously defined vectors, by 3 indices. \emph{mtlib} and \emph{usemtl} defines a 
+material (.mtl) file, and a specific material from that file, respectively.
+An example of the formatting is shown in figure \ref{fig:objfile}.
+
 \begin{figure}
       \begin{minted}{text}
 mtllib [material file name]
@@ -175,20 +197,9 @@ vn 0.707 0.000 0.707
 f 1 2 3
 ...
       \end{minted}
-      \caption{Structure of a .obj file.}
+      \caption{Basic structure of a .obj file.}
       \label{fig:objfile}
 \end{figure}
-
-To use these figures with OpenGL, they were exported into Wavefront \emph{.obj} files,
-which is a plaintext format able to store information about a 3D model, such
-as vector and face information, corresponding material, texture (UV)
-coordinates and vector normals. Each line starting with a \emph{v} is a
-definition of a vector, and is followed by its 3 scalars/coordinates. The
-same applies to the normal vectors, except these are defined by \emph{vn}. Faces
-are defined by a line starting with \emph{f}, but are instead pointing to 3
-previously defined vectors, by 3 indices. \emph{mtlib} and \emph{usemtl} defines a 
-material (.mtl) file, and a specific material from that file, respectively.
-An example of the formatting is shown in figure \ref{fig:objfile}.
 
 The .mtl files are similarly formatted, but instead contain RBG values
 similar to what is used by OpenGL's \texttt{glMaterial} function, hence each a line
@@ -410,6 +421,24 @@ the game.
 \label{sec-4}
 \begin{figure}[h]
       \centering
+      \includegraphics[width=\textwidth]{screen1.png}
+      \caption{Final game. AI have taken control of the center platform}
+\end{figure}
+
+\begin{figure}[h]
+      \centering
+      \includegraphics[width=\textwidth]{screen2.png}
+      \caption{Final game. AI-controlled character approaching}
+\end{figure}
+
+\begin{figure}[h]
+      \centering
+      \includegraphics[width=\textwidth]{screen3.png}
+      \caption{Final game. Player died}
+\end{figure}
+
+\begin{figure}[h]
+      \centering
       \includegraphics[width=\textwidth]{screen0.png}
       \caption{Early stage of the game, testing the .obj parsers}
 \end{figure}
@@ -417,31 +446,14 @@ the game.
 \begin{figure}[h]
       \centering
       \includegraphics[width=\textwidth]{char1.png}
-      \caption{3D model of the ninja, before the eye texture was removed}
+      \caption{3D model of the ninja, before the eye texture was removed, and
+      arms put down}
 \end{figure}
 
 \begin{figure}[h]
       \centering
       \includegraphics[width=\textwidth]{map1.png}
       \caption{3D model of the castle map}
-\end{figure}
-
-\begin{figure}[h]
-      \centering
-      \includegraphics[width=\textwidth]{screen1.png}
-      \caption{AI have taken control of the center platform}
-\end{figure}
-
-\begin{figure}[h]
-      \centering
-      \includegraphics[width=\textwidth]{screen2.png}
-      \caption{AI-controlled character approaching}
-\end{figure}
-
-\begin{figure}[h]
-      \centering
-      \includegraphics[width=\textwidth]{screen3.png}
-      \caption{Player died}
 \end{figure}
 % Emacs 25.3.1 (Org mode 8.2.10)
 \end{document}

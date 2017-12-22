@@ -36,22 +36,24 @@ The player who reaches 500 points first, will win the match, and the game will r
 
 
 ## Installation
-Tested on Linux only and have the following dependencies:
+Tested on Linux only, with the following dependencies
  - OpenGL 4.3
  - Glew
  - Glut
+ - GLM
 
 To install, in a terminal emulator, enter
 ```
-cd ninja-castle-game/src
+cd src
 make
 ```
 
-To run, simply run the resulting `game` binary:
+To run, simply run the resulting `game` binary, located in the `bin` directory:
 ```
-./game
+./bin/game
 ```
 
 ## Controls
  - Move around using the arrow keys
- - Jump by pressing "Z"
+ - Jump by pressing `Z`
+ - Press `ESC` to exit

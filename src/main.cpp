@@ -139,10 +139,10 @@ void setup(void)
     glEnable(GL_LINE_SMOOTH);
     glShadeModel(GL_SMOOTH);
 
-    map.init("models/map1.obj");
-    collision.init("models/map1.obj");
-    player.init((unsigned int)0, (char*)"models/ninja.obj", Team::BLUE, 22.5, 6.5, &collision);
-    ai.init((unsigned int)1, (char*)"models/ninja.obj", Team::RED, 22.5, 8.0, &collision);
+    map.init("../obj/map1.obj");
+    collision.init("../obj/map1.obj");
+    player.init((unsigned int)0, (char*)"../obj/ninja.obj", Team::BLUE, 22.5, 6.5, &collision);
+    ai.init((unsigned int)1, (char*)"../obj/ninja.obj", Team::RED, 22.5, 8.0, &collision);
 
     std::cout << "Game initialization finished" << std::endl << std::endl;
     std::cout << "- Stay on the platform in the middle to gain points." << std::endl;

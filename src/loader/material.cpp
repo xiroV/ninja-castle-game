@@ -7,7 +7,7 @@ void MaterialLoader::load(std::string filename) {
 
     material_t material;
 
-    std::string folder("models/");
+    std::string folder("../obj/");
 
     inFile.open(folder + filename);
     if(!inFile) {

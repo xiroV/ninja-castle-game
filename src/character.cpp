@@ -5,20 +5,6 @@ Character::Character() {}
 void Character::init(unsigned int id, char* filename, Team team, float x, float y, Collision* collision_map) {
 
     this->team = team;
-    // Define colors/materials based on team
-    /*if(this->team == Team::BLUE) {
-        this->mat_ambi = glm::vec4(0.0, 0.0, 0.0, 0.0);
-        this->mat_diff = glm::vec4(0.3, 0.3, 0.3, 1.0);
-        this->mat_spec = glm::vec4(0.1, 0.1, 0.1, 1.0);
-        this->mat_shin = 10.0;
-    } else if(this->team == Team::RED) {
-        this->mat_ambi = glm::vec4(0.0, 0.0, 0.0, 0.0);
-        this->mat_diff = glm::vec4(0.8, 0.3, 0.3, 1.0);
-        this->mat_spec = glm::vec4(0.1, 0.1, 0.1, 1.0);
-        this->mat_shin = 10.0;
-    }*/
-
-
     std::ifstream inFile;
 
     this->id = id;
@@ -189,11 +175,6 @@ void Character::draw() {
     // Rotation around itself
     glRotatef(this->angle, 0, 1, 0);
     
-    /*glMaterialfv(GL_FRONT, GL_AMBIENT, glm::value_ptr(this->mat_ambi));
-    glMaterialfv(GL_FRONT, GL_DIFFUSE, glm::value_ptr(this->mat_diff));
-    glMaterialfv(GL_FRONT, GL_SPECULAR, glm::value_ptr(this->mat_spec));
-    glMaterialfv(GL_FRONT, GL_SHININESS, &this->mat_shin);
-    */
     glDrawArrays(GL_TRIANGLES, 0, this->vertices.size());
 
 
