@@ -1,0 +1,42 @@
+Determining if files usbhid.h exist failed with the following output:
+Change Dir: /home/xirov/sdu/dm842/ninja-castle-game/src/freeglut/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_f64e0/fast"
+/usr/bin/make -f CMakeFiles/cmTC_f64e0.dir/build.make CMakeFiles/cmTC_f64e0.dir/build
+make[1]: Entering directory '/home/xirov/sdu/dm842/ninja-castle-game/src/freeglut/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_f64e0.dir/CheckIncludeFiles.c.o
+/usr/bin/cc   -Wall -pedantic    -o CMakeFiles/cmTC_f64e0.dir/CheckIncludeFiles.c.o   -c /home/xirov/sdu/dm842/ninja-castle-game/src/freeglut/CMakeFiles/CMakeTmp/CheckIncludeFiles.c
+/home/xirov/sdu/dm842/ninja-castle-game/src/freeglut/CMakeFiles/CMakeTmp/CheckIncludeFiles.c:2:10: fatal error: usbhid.h: No such file or directory
+ #include <usbhid.h>
+          ^~~~~~~~~~
+compilation terminated.
+make[1]: *** [CMakeFiles/cmTC_f64e0.dir/build.make:66: CMakeFiles/cmTC_f64e0.dir/CheckIncludeFiles.c.o] Error 1
+make[1]: Leaving directory '/home/xirov/sdu/dm842/ninja-castle-game/src/freeglut/CMakeFiles/CMakeTmp'
+make: *** [Makefile:126: cmTC_f64e0/fast] Error 2
+
+Source:
+/* */
+#include <usbhid.h>
+
+
+int main(void){return 0;}
+
+Determining if the function XParseGeometry exists failed with the following output:
+Change Dir: /home/xirov/sdu/dm842/ninja-castle-game/src/freeglut/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_85fe0/fast"
+/usr/bin/make -f CMakeFiles/cmTC_85fe0.dir/build.make CMakeFiles/cmTC_85fe0.dir/build
+make[1]: Entering directory '/home/xirov/sdu/dm842/ninja-castle-game/src/freeglut/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_85fe0.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -Wall -pedantic -DCHECK_FUNCTION_EXISTS=XParseGeometry   -o CMakeFiles/cmTC_85fe0.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-3.9/Modules/CheckFunctionExists.c
+Linking C executable cmTC_85fe0
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_85fe0.dir/link.txt --verbose=1
+/usr/bin/cc  -Wall -pedantic -DCHECK_FUNCTION_EXISTS=XParseGeometry    -rdynamic CMakeFiles/cmTC_85fe0.dir/CheckFunctionExists.c.o  -o cmTC_85fe0 -lm 
+CMakeFiles/cmTC_85fe0.dir/CheckFunctionExists.c.o: In function `main':
+CheckFunctionExists.c:(.text+0x10): undefined reference to `XParseGeometry'
+collect2: error: ld returned 1 exit status
+make[1]: *** [CMakeFiles/cmTC_85fe0.dir/build.make:98: cmTC_85fe0] Error 1
+make[1]: Leaving directory '/home/xirov/sdu/dm842/ninja-castle-game/src/freeglut/CMakeFiles/CMakeTmp'
+make: *** [Makefile:126: cmTC_85fe0/fast] Error 2
+
+
