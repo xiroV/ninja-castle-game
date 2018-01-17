@@ -1,5 +1,5 @@
 CC = g++
-LIBS = -L/usr/local/lib -lGL -lGLU -lXrandr -lXxf86vm -lXi -lX11 glew/lib64/libGLEW.a freeglut/lib/libglut.a
+LIBS = -L/usr/local/lib -lGL -lGLU -lX11 -lGLEW -lglut
 CFLAGS = -Wall
 
 all:	game
