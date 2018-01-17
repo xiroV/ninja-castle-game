@@ -1,1 +1,4 @@
 *.o
+report/
+*.zip
+ninja-castle-game/
