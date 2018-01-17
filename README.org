@@ -6,7 +6,7 @@ on The University of Southern Denmark in the fall of 2017.
 The goal was to make a King of the Hill game, 3D platform style.
 
 The game is written in C++, and all 3D files have been made using
-the Open Source 3D suite [Blender][https://www.blender.org/].
+the Open Source 3D suite [[https://www.blender.org/][Blender]].
 
 The current status:
 
