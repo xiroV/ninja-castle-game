@@ -1,5 +1,5 @@
-# Ninja Castle
-## Introduction
+* Ninja Castle
+** Introduction
 This was originally a project for DM842 Computer Game Programming course
 on The University of Southern Denmark in the fall of 2017.
 
@@ -19,7 +19,7 @@ The current status:
  - [x] King of the Hill Mechanics (score, etc.)
 
 
-## Goals
+** Goals
 The game is a variation of the King of the Hill children game. The game
 takes place in a castle-like arena with a center platform and a surrounding moat.
 
@@ -36,7 +36,7 @@ and anyone who falls down the moat will respawn after 3 seconds.
 The player who reaches 500 points first, will win the match, and the game will restart.
 
 
-## Installation
+** Installation
 Tested on Linux only, with the following dependencies
  - OpenGL 4.3
  - Glew
@@ -54,7 +54,7 @@ To run, simply run the resulting `game` binary, located in the `bin` directory:
 ./bin/game
 ```
 
-## Controls
+** Controls
  - Move around using the arrow keys
  - Jump by pressing `Z`
  - Press `ESC` to exit
