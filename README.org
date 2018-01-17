@@ -1,22 +1,23 @@
 * Ninja Castle
 ** Introduction
 This was originally a project for DM842 Computer Game Programming course
-on The University of Southern Denmark in the fall of 2017.
+on The University of Southern Denmark in the fall of 2017. The goal was to make a King of the Hill game, 3D platform style.
 
-The goal was to make a King of the Hill game, 3D platform style.
+The game is written in C++ using as few dependencies as possible, utilizing
+OpenGL, and all 3D files have been made using the Open Source 3D suite [[https://www.blender.org/][Blender]].
 
-The game is written in C++, and all 3D files have been made using
-the Open Source 3D suite [[https://www.blender.org/][Blender]].
-
-The current status:
+** Current Status:
 
  - [x] Player Movement
  - [x] Character Graphics
  - [ ] Character Animation
  - [ ] Character Attack (collision detection) (Needs fixing)
- - [x] AI
+ - [x] AI (could use improvement, but works)
  - [x] World/Level Graphics
  - [x] King of the Hill Mechanics (score, etc.)
+ - [ ] Print score on screen
+ - [ ] Switch from build-in OpenGL shaders to Custom Shaders
+ - [ ] Implement loading of textures instead of materials
 
 
 ** Goals
