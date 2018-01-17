@@ -1,10 +1,10 @@
 CC = g++
-LIBS = -L/usr/local/lib -lGL -lGLU -lX11 -lGLEW -lglut
+LIBS = -L/usr/local/lib -lGL -lGLU -lGLEW -lglut
 CFLAGS = -Wall
 
-all:	game
+all:	ninjacastle
 
-game: main.o player.o map.o core.o ai.o character.o loader/material.o
+ninjacastle: main.o player.o map.o core.o ai.o character.o loader/material.o
 	$(CC) -o ../bin/$@ main.o player.o map.o core.o ai.o character.o material.o $(LIBS)
 
 %.o: %.cpp
@@ -14,4 +14,4 @@ loader/%.o: %.cpp
 	$(CC) -c $(CFLAGS) $<
 
 clean:
-	rm -f ../bin/game *.o loader/*.o
+	rm -f ../bin/ninjacastle *.o loader/*.o
