@@ -44,15 +44,15 @@ Tested on Linux only, with the following dependencies
  - GLM
 
 To install, in a terminal emulator, enter
-```
+#+BEGIN_SRC bash
 cd src
 make
-```
+#+END_SRC
 
 To run, simply run the resulting `game` binary, located in the `bin` directory:
-```
+#+BEGIN_SRC bash
 ./bin/game
-```
+#+END_SRC
 
 ** Controls
  - Move around using the arrow keys
