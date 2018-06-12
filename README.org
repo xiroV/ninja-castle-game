@@ -1,3 +1,6 @@
+* NOTICE
+This project have been moved to GitLab: [[https://gitlab.com/xiroV/ninja-castle-game]]
+
 * Ninja Castle
 ** Introduction
 This was originally a project for DM842 Computer Game Programming course
